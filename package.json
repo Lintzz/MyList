@@ -45,7 +45,7 @@
     "publish": {
       "provider": "github",
       "owner": "Lintzz",
-      "repo": "MyListApp"
+      "repo": "MyList"
     }
   }
 }
