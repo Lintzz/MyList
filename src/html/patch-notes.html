@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="patch_notes.title">Novidades da Versão</title>
+    <style>
+      /* Estilos baseados no seu global.css para consistência */
+      :root {
+        --bg-color: #121212;
+        --surface-color: #1e1e1e;
+        --primary-text-color: #e0e0e0;
+        --secondary-text-color: #a0a0a0;
+        --accent-color: #007bff;
+        --border-color: #383838;
+        --success-color: #28a745;
+        --warning-color: #fd7e14;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--primary-text-color);
+        margin: 0;
+        padding: 25px;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 750px;
+        margin: 0 auto;
+        background-color: var(--surface-color);
+        padding: 20px 40px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+      }
+      h1,
+      h2 {
+        color: var(--primary-text-color);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+      }
+      h1 {
+        text-align: center;
+        font-size: 1.8em;
+        color: var(--accent-color);
+      }
+      h2 {
+        font-size: 1.4em;
+        margin-top: 30px;
+      }
+      ul {
+        padding-left: 20px;
+        color: var(--secondary-text-color);
+        list-style: none;
+      }
+      li {
+        margin-bottom: 12px;
+        position: relative;
+        padding-left: 25px;
+      }
+      li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: var(--success-color);
+        font-weight: bold;
+      }
+      strong {
+        color: var(--primary-text-color);
+      }
+      .highlight {
+        background-color: var(--accent-color);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 0.85em;
+        margin-right: 8px;
+      }
+      .close-btn {
+        display: block;
+        width: 150px;
+        margin: 40px auto 10px;
+        padding: 12px;
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        text-align: center;
+        transition: opacity 0.2s;
+      }
+      .close-btn:hover {
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 data-i18n="patch_notes.main_title">Notas da Atualização - MyList</h1>
+
+      <h2 data-i18n="patch_notes.new_features_title">
+        🚀 Novas Funcionalidades
+      </h2>
+      <ul>
+        <li data-i18n="patch_notes.social_friends_feature">
+          <span class="highlight">Social</span>Implementada a funcionalidade
+          completa de **Amigos**, permitindo procurar, adicionar, aceitar e
+          remover utilizadores.
+        </li>
+        <li data-i18n="patch_notes.social_profile_feature">
+          <span class="highlight">Social</span>O antigo "Painel" foi
+          transformado numa página de **Perfil de Utilizador** completa e
+          idêntica à do seu amigo, com imagem de capa, avatar e estatísticas
+          detalhadas.
+        </li>
+        <li data-i18n="patch_notes.sharing_feature">
+          <span class="highlight">Partilha</span>Adicionada uma opção no perfil
+          para gerar e guardar uma **imagem com as suas estatísticas
+          principais**, ideal para partilhar.
+        </li>
+      </ul>
+
+      <h2 data-i18n="patch_notes.improvements_title">
+        🛠️ Melhorias e Qualidade de Vida
+      </h2>
+      <ul>
+        <li data-i18n="patch_notes.mark_all_improvement">
+          <span class="highlight">Interface</span>Adicionado um botão **"Marcar
+          Tudo"** também no ecrã de **edição** de itens, para maior
+          consistência.
+        </li>
+        <li data-i18n="patch_notes.favorite_star_improvement">
+          <span class="highlight">Interface</span>A estrela no menu de opções
+          agora fica **amarela** quando um item está favoritado.
+        </li>
+        <li data-i18n="patch_notes.episode_count_improvement">
+          <span class="highlight">Interface</span>A contagem de episódios na
+          lista principal foi **alinhada visualmente** para uma aparência mais
+          limpa, mantendo o tamanho da fonte original.
+        </li>
+        <li data-i18n="patch_notes.progress_status_improvement">
+          <span class="highlight">Progresso</span>Para Livros e Jogos, o sistema
+          de status foi melhorado para incluir opções como **"Lendo"** e
+          **"Jogando"**.
+        </li>
+        <li data-i18n="patch_notes.enter_key_improvement">
+          <span class="highlight">Usabilidade</span>A tecla **Enter** agora
+          funciona para confirmar ações nos principais modais da aplicação.
+        </li>
+      </ul>
+
+      <h2 data-i18n="patch_notes.bug_fixes_title">✔️ Correções de Bugs</h2>
+      <ul>
+        <li data-i18n="patch_notes.search_fix">
+          <span class="highlight">Busca</span>A pesquisa de animes foi melhorada
+          para dar prioridade a resultados com o nome exato, em vez de ordenar
+          por popularidade.
+        </li>
+        <li data-i18n="patch_notes.interface_fix_ongoing">
+          <span class="highlight">Interface</span>Itens em andamento (como One
+          Piece) agora mostram um **"?"** como total de episódios, em vez de
+          "0".
+        </li>
+        <li data-i18n="patch_notes.general_fix_duplicate">
+          <span class="highlight">Geral</span>Corrigido um bug que impedia a
+          adição de itens repetidos à mesma lista.
+        </li>
+        <li data-i18n="patch_notes.general_fix_cache">
+          <span class="highlight">Geral</span>Resolvido um problema de cache que
+          fazia o botão de item "Aleatório" mostrar o mesmo resultado várias
+          vezes.
+        </li>
+        <li data-i18n="patch_notes.sorting_fix">
+          <span class="highlight">Ordenação</span>A ordenação por status foi
+          corrigida para seguir a ordem lógica: **Não Visto > A Ver > Concluído
+          > Finalizado**.
+        </li>
+      </ul>
+
+      <button
+        id="close-btn"
+        class="close-btn"
+        data-i18n="patch_notes.close_button"
+      >
+        Fechar
+      </button>
+    </div>
+
+    <script>
+      // Simples script para fechar a janela quando o botão é clicado
+      document.getElementById("close-btn").addEventListener("click", () => {
+        window.close();
+      });
+    </script>
+  </body>
+</html>

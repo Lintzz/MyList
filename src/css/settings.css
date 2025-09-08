@@ -1,0 +1,221 @@
+@import url("global.css");
+
+#btn-back {
+  -webkit-app-region: no-drag;
+  background: none;
+  height: 45px;
+  border: none;
+  color: var(--primary-text-color);
+  font-size: 1em;
+  padding: 5px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+#btn-back:hover {
+  background-color: var(--surface-highlight-color);
+}
+#btn-back i {
+  margin-right: 8px;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+.settings-container {
+  display: flex;
+  max-width: 900px;
+  margin: 0 auto;
+  gap: 30px;
+}
+.settings-sidebar {
+  flex: 0 0 200px;
+}
+.settings-content {
+  flex: 1 1 auto;
+}
+
+.settings-sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: var(--secondary-text-color);
+  border-radius: 6px;
+  margin-bottom: 5px;
+  transition: background-color 0.2s, color 0.2s;
+  font-weight: 500;
+}
+.settings-sidebar .nav-link:hover {
+  background-color: var(--surface-highlight-color);
+  color: var(--primary-text-color);
+}
+.settings-sidebar .nav-link.active {
+  background-color: var(--accent-color);
+  color: white;
+}
+.settings-sidebar .nav-link i {
+  width: 20px;
+  text-align: center;
+}
+
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+.setting-section {
+  background-color: var(--surface-color);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  border: 1px solid var(--border-color);
+}
+.settings-content h2 {
+  margin-top: 0;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+.setting-section h3 {
+  margin-top: 0;
+}
+.setting-section p {
+  color: var(--secondary-text-color);
+  margin-bottom: 15px;
+}
+.setting-section ul {
+  padding-left: 20px;
+}
+.setting-section a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+.setting-section a:hover {
+  text-decoration: underline;
+}
+
+.button-settings {
+  padding: 10px 20px;
+  font-size: 0.9em;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  background-color: var(--button-bg-color);
+  color: var(--primary-text-color);
+  transition: opacity 0.2s;
+}
+.button-settings:hover {
+  opacity: 0.85;
+}
+.button-settings.destructive {
+  background-color: var(--destructive-color);
+  color: white;
+}
+.form-group {
+  margin-bottom: 15px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--input-bg-color);
+  color: var(--primary-text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 1em;
+}
+
+.list-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--button-bg-color);
+  transition: 0.4s;
+  border-radius: 28px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: var(--accent-color);
+}
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+#modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+#modal-actions button {
+  padding: 10px 20px;
+  font-size: 0.9em;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+#modal-btn-cancel {
+  background-color: var(--button-bg-color);
+  color: var(--primary-text-color);
+}
+#modal-btn-confirm.destructive {
+  background-color: var(--destructive-color);
+  color: white;
+}
+
+.setting-section .form-group input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--input-bg-color);
+  color: var(--primary-text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+.setting-section .form-group input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.2);
+}

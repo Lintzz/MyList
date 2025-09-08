@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' app: https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com;"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/profile.css" />
+    <title data-i18n="user_profile.title">Perfil de Utilizador</title>
+  </head>
+  <body>
+    <div id="title-bar">
+      <div id="drag-region">
+        <button id="btn-back" title="Voltar" class="back-button">
+          <i class="fas fa-arrow-left"></i>
+          <span data-i18n="settings.back_button">Voltar</span>
+        </button>
+      </div>
+      <div id="window-controls">
+        <button id="minimize-btn" data-i18n="[title]window.minimize">_</button>
+        <button id="maximize-btn" data-i18n="[title]window.maximize">☐</button>
+        <button id="close-btn" data-i18n="[title]window.close">✕</button>
+      </div>
+    </div>
+
+    <div id="loading-screen">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="profile-container hidden">
+      <div class="profile-header">
+        <img
+          id="cover-photo"
+          src="https://placehold.co/800x250/1e1e1e/1e1e1e"
+          alt="Foto de Capa"
+        />
+        <div class="profile-avatar-container">
+          <img
+            id="user-avatar"
+            src="https://placehold.co/100x100/2C2C2C/E0E0E0?text=Foto"
+            alt="Avatar"
+          />
+          <h1 id="user-nickname" data-i18n="user_profile.loading">
+            Carregando...
+          </h1>
+        </div>
+        <div class="profile-actions"></div>
+      </div>
+
+      <div class="dashboard-container">
+        <section class="dashboard-section overview-section">
+          <h2 data-i18n="dashboard.overview_title">Visão Geral</h2>
+          <div class="overview-grid">
+            <div class="stat-card">
+              <i class="fas fa-list-ol"></i>
+              <div class="stat-info">
+                <span id="total-items" class="stat-value">0</span>
+                <span class="stat-label" data-i18n="dashboard.total_items"
+                  >Itens Totais</span
+                >
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-check-double"></i>
+              <div class="stat-info">
+                <span id="total-completed" class="stat-value">0</span>
+                <span class="stat-label" data-i18n="dashboard.completed_items"
+                  >Itens Concluídos</span
+                >
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-star"></i>
+              <div class="stat-info">
+                <span id="total-favorites" class="stat-value">0</span>
+                <span class="stat-label" data-i18n="dashboard.favorite_items"
+                  >Itens Favoritos</span
+                >
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-clock"></i>
+              <div class="stat-info">
+                <span id="total-time" class="stat-value">0h</span>
+                <span class="stat-label" data-i18n="dashboard.total_time"
+                  >Tempo Gasto (Est.)</span
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_title">Favoritos</h2>
+          <div id="favorites-carousel" class="carousel-container">
+            <p class="placeholder-text" data-i18n="user_profile.no_favorites">
+              Este utilizador não marcou nenhum item como favorito.
+            </p>
+          </div>
+        </section>
+
+        <section class="dashboard-section stats-by-list-section">
+          <h2 data-i18n="dashboard.stats_by_list_title">
+            Estatísticas por Lista
+          </h2>
+          <div id="stats-by-list-container" class="stats-grid">
+            <div class="loading-spinner-container">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script src="../../node_modules/firebase/firebase-app-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-auth-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/user-profile.js" type="module"></script>
+  </body>
+</html>

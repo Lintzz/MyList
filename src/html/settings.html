@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' app: https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com;"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="settings.title">Configurações - Minha Lista</title>
+    <link rel="stylesheet" href="../css/settings.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div id="title-bar">
+      <div id="drag-region">
+        <button id="btn-back" title="Voltar para a lista">
+          <i class="fas fa-arrow-left"></i>
+          <span data-i18n="settings.back_button">Voltar</span>
+        </button>
+      </div>
+      <div id="window-controls">
+        <button id="minimize-btn" data-i18n="[title]window.minimize">_</button>
+        <button id="maximize-btn" data-i18n="[title]window.maximize">☐</button>
+        <button id="close-btn" data-i18n="[title]window.close">✕</button>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <div class="settings-container">
+        <nav class="settings-sidebar">
+          <a href="#" class="nav-link active" data-tab="conta"
+            ><i class="fas fa-user-circle"></i>
+            <span data-i18n="settings.sidebar_account">Conta</span></a
+          >
+          <a href="#" class="nav-link" data-tab="aparencia"
+            ><i class="fas fa-palette"></i>
+            <span data-i18n="settings.sidebar_appearance">Aparência</span></a
+          >
+          <a href="#" class="nav-link" data-tab="dados"
+            ><i class="fas fa-database"></i>
+            <span data-i18n="settings.sidebar_data">Dados</span></a
+          >
+          <a href="#" class="nav-link" data-tab="sobre"
+            ><i class="fas fa-info-circle"></i>
+            <span data-i18n="settings.sidebar_about">Sobre</span></a
+          >
+        </nav>
+
+        <div class="settings-content">
+          <div id="conta" class="tab-content active">
+            <h2 data-i18n="settings.account_title">Conta</h2>
+            <div class="setting-section">
+              <h3 data-i18n="settings.delete_list_title">Apagar Listas</h3>
+              <p data-i18n="settings.delete_list_subtitle">
+                Esta ação é irreversível. Todos os itens de todas as suas listas
+                serão permanentemente apagados.
+              </p>
+              <button
+                id="btn-delete-lists"
+                class="button-settings destructive"
+                data-i18n="settings.delete_list_button"
+              >
+                Apagar Todas as Listas
+              </button>
+            </div>
+
+            <div class="setting-section">
+              <h3 data-i18n="settings.delete_account_title">Apagar Conta</h3>
+              <p data-i18n="settings.delete_account_subtitle">
+                Esta ação é final e irreversível. Todos os seus dados serão
+                permanentemente apagados.
+              </p>
+              <button
+                id="btn-delete-account"
+                class="button-settings destructive"
+                data-i18n="settings.delete_account_button"
+              >
+                Apagar a Minha Conta
+              </button>
+            </div>
+          </div>
+
+          <div id="aparencia" class="tab-content">
+            <h2 data-i18n="settings.appearance_title">Aparência</h2>
+            <div class="setting-section">
+              <h3 data-i18n="settings.theme_title">Tema</h3>
+              <p data-i18n="settings.theme_subtitle">
+                Escolha entre o tema claro ou escuro para o aplicativo.
+              </p>
+              <div class="form-group">
+                <label for="theme-selector" data-i18n="settings.theme_label"
+                  >Tema</label
+                >
+                <select id="theme-selector">
+                  <option value="theme-dark" data-i18n="settings.theme_dark">
+                    Escuro (Dark)
+                  </option>
+                  <option value="theme-light" data-i18n="settings.theme_light">
+                    Claro (Light)
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="setting-section">
+              <h3 data-i18n="settings.accent_color_title">Cor de Destaque</h3>
+              <p data-i18n="settings.accent_color_subtitle">
+                Personalize a cor principal de botões e links.
+              </p>
+              <div class="form-group">
+                <label
+                  for="accent-color-selector"
+                  data-i18n="settings.accent_color_label"
+                  >Cor Principal</label
+                >
+                <select id="accent-color-selector">
+                  <option value="blue" data-i18n="settings.accent_color_blue">
+                    Azul (Padrão)
+                  </option>
+                  <option
+                    value="purple"
+                    data-i18n="settings.accent_color_purple"
+                  >
+                    Roxo
+                  </option>
+                  <option value="green" data-i18n="settings.accent_color_green">
+                    Verde
+                  </option>
+                  <option
+                    value="orange"
+                    data-i18n="settings.accent_color_orange"
+                  >
+                    Laranja
+                  </option>
+                  <option value="red" data-i18n="settings.accent_color_red">
+                    Vermelho
+                  </option>
+                  <option value="pink" data-i18n="settings.accent_color_pink">
+                    Rosa
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="setting-section">
+              <h3 data-i18n="settings.list_density_title">
+                Densidade da Lista
+              </h3>
+              <p data-i18n="settings.list_density_subtitle">
+                Altere o espaçamento dos itens na sua lista.
+              </p>
+              <div class="form-group">
+                <label
+                  for="list-density-selector"
+                  data-i18n="settings.list_density_label"
+                  >Densidade</label
+                >
+                <select id="list-density-selector">
+                  <option
+                    value="compact"
+                    data-i18n="settings.list_density_compact"
+                  >
+                    Compacta
+                  </option>
+                  <option
+                    value="default"
+                    data-i18n="settings.list_density_default"
+                  >
+                    Padrão
+                  </option>
+                  <option
+                    value="comfortable"
+                    data-i18n="settings.list_density_comfortable"
+                  >
+                    Confortável
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="setting-section">
+              <h3 data-i18n="settings.language_title">Idioma</h3>
+              <p data-i18n="settings.language_subtitle">
+                Escolha o idioma de exibição do aplicativo.
+              </p>
+              <div class="form-group">
+                <label
+                  for="language-selector"
+                  data-i18n="settings.language_label"
+                  >Idioma</label
+                >
+                <select id="language-selector">
+                  <option value="pt" data-i18n="settings.language_pt">
+                    Português
+                  </option>
+                  <option value="en" data-i18n="settings.language_en">
+                    Inglês (English)
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="dados" class="tab-content">
+            <h2 data-i18n="settings.data_title">Backup e Restauração</h2>
+            <div class="setting-section">
+              <h3 data-i18n="settings.export_title">Fazer Backup (Exportar)</h3>
+              <p data-i18n="settings.export_subtitle">
+                Exporte sua lista para um ficheiro JSON.
+              </p>
+              <button
+                id="btn-export"
+                class="button-settings"
+                data-i18n="settings.export_button"
+              >
+                Exportar Lista
+              </button>
+            </div>
+            <div class="setting-section">
+              <h3 data-i18n="settings.import_title">
+                Restaurar Backup (Importar)
+              </h3>
+              <p data-i18n="settings.import_subtitle">
+                Importe um ficheiro de backup para restaurar sua lista.
+                <strong>Atenção:</strong> Isto substituirá a lista atual.
+              </p>
+              <button
+                id="btn-import"
+                class="button-settings"
+                data-i18n="settings.import_button"
+              >
+                Importar Backup
+              </button>
+            </div>
+          </div>
+
+          <div id="sobre" class="tab-content">
+            <h2 data-i18n="settings.about_title">Sobre</h2>
+            <div class="setting-section">
+              <h3 data-i18n="settings.about_app_title">Minha Lista Desktop</h3>
+              <p data-i18n="settings.about_app_version">
+                <strong>Versão:</strong> 1.1.0
+              </p>
+              <p data-i18n="settings.about_app_subtitle">
+                Um aplicativo para organizar e acompanhar as suas mídias
+                favoritas.
+              </p>
+              <button
+                id="btn-github"
+                class="button-settings"
+                data-i18n="settings.github_button"
+              >
+                Ver no GitHub
+              </button>
+            </div>
+            <div class="setting-section">
+              <h3 data-i18n="settings.credits_title">Créditos</h3>
+              <p data-i18n="settings.credits_subtitle">Dados fornecidos por:</p>
+              <ul>
+                <li>
+                  <a href="#" id="link-jikan" data-i18n="settings.credit_jikan"
+                    >Jikan API (MyAnimeList)</a
+                  >
+                </li>
+                <li>
+                  <a href="#" id="link-tmdb" data-i18n="settings.credit_tmdb"
+                    >The Movie Database (TMDB)</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    id="link-openlibrary"
+                    data-i18n="settings.credit_openlibrary"
+                    >Open Library</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    id="link-comicvine"
+                    data-i18n="settings.credit_comicvine"
+                    >Comic Vine API</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    id="link-giantbomb"
+                    data-i18n="settings.credit_giantbomb"
+                    >Giant Bomb API</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="modal-overlay" class="hidden">
+      <div id="custom-modal">
+        <h2 id="modal-title">Título</h2>
+        <p id="modal-message">Mensagem.</p>
+        <div id="modal-actions">
+          <button id="modal-btn-cancel" data-i18n="app.modal_cancel">
+            Cancelar
+          </button>
+          <button
+            id="modal-btn-confirm"
+            class="destructive"
+            data-i18n="app.modal_confirm"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../node_modules/firebase/firebase-app-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-auth-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-firestore-compat.js"></script>
+
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/settings.js" type="module"></script>
+  </body>
+</html>

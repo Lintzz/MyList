@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' app: https://www.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com;"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/profile.css" />
+    <title data-i18n="dashboard.title">Painel de Estatísticas</title>
+  </head>
+  <body>
+    <div id="title-bar">
+      <div id="drag-region">
+        <button id="btn-back" title="Voltar" class="back-button">
+          <i class="fas fa-arrow-left"></i>
+          <span data-i18n="settings.back_button">Voltar</span>
+        </button>
+      </div>
+      <div id="window-controls">
+        <button id="minimize-btn" data-i18n="[title]window.minimize">_</button>
+        <button id="maximize-btn" data-i18n="[title]window.maximize">☐</button>
+        <button id="close-btn" data-i18n="[title]window.close">✕</button>
+      </div>
+    </div>
+
+    <div class="profile-container">
+      <div class="profile-header">
+        <img
+          id="cover-photo"
+          src="https://placehold.co/800x250/1e1e1e/1e1e1e"
+          alt="Foto de Capa"
+        />
+        <div class="profile-avatar-container">
+          <img
+            id="user-avatar"
+            src="https://placehold.co/100x100/2C2C2C/E0E0E0?text=Foto"
+            alt="Avatar"
+          />
+          <h1 id="user-nickname">Carregando...</h1>
+        </div>
+        <div class="profile-actions">
+          <button id="edit-profile-btn" class="profile-action-btn">
+            <i class="fas fa-cog"></i>
+            <span data-i18n="profile.edit_button">Editar Perfil</span>
+          </button>
+          <button id="share-profile-btn" class="profile-action-btn">
+            <i class="fas fa-share-alt"></i>
+            <span data-i18n="profile.share_button">Compartilhar</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="dashboard-container">
+        <section class="dashboard-section overview-section">
+          <h2 data-i18n="dashboard.overview_title">Visão Geral</h2>
+          <div class="overview-grid">
+            <div class="stat-card">
+              <i class="fas fa-list-ol"></i>
+              <div class="stat-info">
+                <span id="total-items" class="stat-value">0</span>
+                <span class="stat-label" data-i18n="dashboard.total_items"
+                  >Itens Totais</span
+                >
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-check-double"></i>
+              <div class="stat-info">
+                <span id="total-completed" class="stat-value">0</span>
+                <span class="stat-label" data-i18n="dashboard.completed_items"
+                  >Itens Concluídos</span
+                >
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-star"></i>
+              <div class="stat-info">
+                <span id="total-favorites" class="stat-value">0</span>
+                <span class="stat-label" data-i18n="dashboard.favorite_items"
+                  >Itens Favoritos</span
+                >
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-clock"></i>
+              <div class="stat-info">
+                <span id="total-time" class="stat-value">0h</span>
+                <span class="stat-label" data-i18n="dashboard.total_time"
+                  >Tempo Gasto (Est.)</span
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_title">Meus Favoritos</h2>
+          <div id="favorites-carousel" class="carousel-container">
+            <p class="placeholder-text" data-i18n="dashboard.no_favorites">
+              Você ainda não marcou nenhum item como favorito.
+            </p>
+          </div>
+        </section>
+
+        <section class="dashboard-section stats-by-list-section">
+          <h2 data-i18n="dashboard.stats_by_list_title">
+            Estatísticas por Lista
+          </h2>
+          <div id="stats-by-list-container" class="stats-grid">
+            <div class="spinner-container">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div id="edit-profile-modal-overlay" class="hidden">
+      <div id="edit-profile-modal">
+        <h2 data-i18n="profile.modal_title">Editar Perfil</h2>
+        <div class="form-group">
+          <label
+            for="modal-nickname-input"
+            data-i18n="profile.display_name_label"
+            >Nome de Exibição</label
+          >
+          <input
+            type="text"
+            id="modal-nickname-input"
+            data-i18n="[placeholder]profile.display_name_placeholder"
+            placeholder="Como gostaria de ser chamado?"
+          />
+        </div>
+        <div class="form-group">
+          <label
+            for="modal-avatar-url-input"
+            data-i18n="profile.avatar_url_label"
+            >URL da Foto de Perfil</label
+          >
+          <input
+            type="text"
+            id="modal-avatar-url-input"
+            data-i18n="[placeholder]profile.avatar_url_placeholder"
+            placeholder="Cole o link da imagem aqui"
+          />
+        </div>
+        <div class="form-group">
+          <label
+            for="modal-banner-url-input"
+            data-i18n="profile.banner_url_label"
+            >URL do Banner</label
+          >
+          <input
+            type="text"
+            id="modal-banner-url-input"
+            data-i18n="[placeholder]profile.banner_url_placeholder"
+            placeholder="Cole o link da imagem aqui"
+          />
+        </div>
+        <div class="modal-actions">
+          <button id="modal-cancel-btn" data-i18n="app.modal_cancel">
+            Cancelar
+          </button>
+          <button
+            id="modal-save-btn"
+            class="button-primary"
+            data-i18n="profile.save_button"
+          >
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="share-template"
+      style="
+        display: none;
+        width: 600px;
+        padding: 30px;
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif;
+      "
+    >
+      <h2
+        style="
+          text-align: center;
+          color: var(--accent-color);
+          margin-bottom: 25px;
+        "
+        data-i18n="profile.share_title"
+      >
+        Minhas Estatísticas - MyList
+      </h2>
+      <div
+        style="
+          display: flex;
+          justify-content: space-around;
+          text-align: center;
+          margin-bottom: 25px;
+        "
+      >
+        <div>
+          <div style="font-size: 2em; font-weight: bold" id="share-total-items">
+            0
+          </div>
+          <div
+            style="font-size: 0.9em; color: #a0a0a0"
+            data-i18n="dashboard.total_items"
+          >
+            Itens Totais
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 2em; font-weight: bold" id="share-total-time">
+            0h
+          </div>
+          <div
+            style="font-size: 0.9em; color: #a0a0a0"
+            data-i18n="dashboard.total_time"
+          >
+            Tempo Gasto (Est.)
+          </div>
+        </div>
+        <div>
+          <div
+            style="font-size: 2em; font-weight: bold"
+            id="share-total-favorites"
+          >
+            0
+          </div>
+          <div
+            style="font-size: 0.9em; color: #a0a0a0"
+            data-i18n="dashboard.favorite_items"
+          >
+            Favoritos
+          </div>
+        </div>
+      </div>
+      <div
+        style="
+          text-align: center;
+          margin-top: 20px;
+          font-size: 0.8em;
+          color: #a0a0a0;
+        "
+        data-i18n="profile.share_footer"
+      >
+        Gerado pelo MyList App
+      </div>
+    </div>
+
+    <div id="modal-overlay" class="hidden">
+      <div id="custom-modal">
+        <h2 id="modal-title">Título</h2>
+        <p id="modal-message">Mensagem.</p>
+        <div id="modal-actions">
+          <button id="modal-btn-cancel" data-i18n="app.modal_cancel">
+            Cancelar
+          </button>
+          <button
+            id="modal-btn-confirm"
+            class="destructive"
+            data-i18n="app.modal_confirm"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../node_modules/firebase/firebase-app-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-auth-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-firestore-compat.js"></script>
+    <script src="../../node_modules/html2canvas/dist/html2canvas.min.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/modal.js" type="module"></script>
+    <script src="../js/profile.js" type="module"></script>
+  </body>
+</html>

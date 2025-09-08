@@ -1,0 +1,78 @@
+@import url("global.css");
+@import url("style.css");
+
+body {
+  overflow: hidden;
+}
+
+.hub-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: calc(100vh - 40px);
+  padding: 40px 20px 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.welcome-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.welcome-header h1 {
+  font-size: 2.2em;
+  color: var(--primary-text-color);
+  margin: 0 0 10px 0;
+}
+
+.welcome-header p {
+  font-size: 1.1em;
+  color: var(--secondary-text-color);
+  margin: 0;
+}
+
+.list-selection-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 25px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.list-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s, border-color 0.2s,
+    box-shadow 0.2s;
+  color: var(--primary-text-color);
+  font-size: 1.2em;
+  font-weight: 500;
+  text-align: center;
+}
+
+.list-card:hover {
+  transform: translateY(-8px);
+  background-color: var(--surface-highlight-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.list-card i {
+  font-size: 3.5em;
+  margin-bottom: 20px;
+  color: var(--accent-color);
+  transition: transform 0.2s ease;
+}
+
+.list-card:hover i {
+  transform: scale(1.1);
+}

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' app: https://www.gstatic.com https://cdn.jsdelivr.net;"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="app.title">Minha Lista de Animes</title>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div id="loading-screen" class="hidden">
+      <div class="spinner"></div>
+      <p data-i18n="app.loading">A carregar...</p>
+    </div>
+
+    <div id="app-content" class="hidden">
+      <div id="title-bar">
+        <div
+          id="user-profile-area"
+          class="loading-skeleton"
+          data-i18n="[title]app.user_menu_tooltip"
+        >
+          <div class="skeleton skeleton-avatar"></div>
+          <div class="skeleton skeleton-text"></div>
+          <img id="user-avatar" src="" alt="Avatar do utilizador" />
+          <span id="user-nickname">Utilizador</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div id="drag-region"></div>
+        <div id="window-controls">
+          <button id="minimize-btn" data-i18n="[title]window.minimize">
+            _
+          </button>
+          <button id="maximize-btn" data-i18n="[title]window.maximize">
+            ☐
+          </button>
+          <button id="close-btn" data-i18n="[title]window.close">✕</button>
+        </div>
+      </div>
+      <nav class="top-nav">
+        <a
+          href="#"
+          class="nav-link active"
+          data-content="lista"
+          data-i18n="app.nav_list"
+          >Lista</a
+        >
+        <a
+          href="#"
+          class="nav-link"
+          data-content="explorar"
+          data-i18n="app.nav_explore"
+          >Explorar</a
+        >
+        <a
+          href="#"
+          class="nav-link"
+          data-content="tendencias"
+          data-i18n="app.nav_trends"
+          >Tendências</a
+        >
+      </nav>
+      <div class="main-content">
+        <div id="lista-view">
+          <div class="list-switcher">
+            <button id="list-title-btn">
+              <h1 id="page-title-text">Minha Lista de Animes</h1>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div id="list-switcher-dropdown" class="hidden">
+              <a
+                href="#"
+                class="list-option"
+                data-list-type="anime"
+                data-i18n="app.title_anime"
+                >Minha Lista de Animes</a
+              >
+              <a
+                href="#"
+                class="list-option"
+                data-list-type="manga"
+                data-i18n="app.title_manga"
+                >Minha Lista de Mangás</a
+              >
+              <a
+                href="#"
+                class="list-option"
+                data-list-type="movies"
+                data-i18n="app.title_movies"
+                >Minha Lista de Filmes</a
+              >
+              <a
+                href="#"
+                class="list-option"
+                data-list-type="series"
+                data-i18n="app.title_series"
+                >Minha Lista de Séries</a
+              >
+              <a
+                href="#"
+                class="list-option"
+                data-list-type="comics"
+                data-i18n="app.title_comics"
+                >Minha Lista de HQs</a
+              >
+              <a
+                href="#"
+                class="list-option"
+                data-list-type="books"
+                data-i18n="app.title_books"
+                >Minha Lista de Livros</a
+              >
+              <a
+                href="#"
+                class="list-option"
+                data-list-type="games"
+                data-i18n="app.title_games"
+                >Minha Lista de Games</a
+              >
+            </div>
+          </div>
+          <div id="listaContainer">
+            <div id="controls-bar">
+              <button
+                id="mostrarFormBtn"
+                class="botao-add"
+                data-i18n="[title]app.add_item_tooltip"
+              >
+                +
+              </button>
+              <div class="search-container">
+                <i class="fas fa-magnifying-glass"></i>
+                <input
+                  type="text"
+                  id="pesquisaInput"
+                  data-i18n="[placeholder]app.search_placeholder"
+                />
+              </div>
+              <div class="action-buttons">
+                <button
+                  id="random-item-btn"
+                  data-i18n="[title]app.random_tooltip"
+                >
+                  <i class="fas fa-dice"></i>
+                </button>
+                <button id="sort-menu-btn">Ordenar: Pessoal</button>
+                <button id="filter-menu-btn">Filtro: Todos</button>
+              </div>
+            </div>
+            <div class="cabecalho-lista">
+              <div class="col-drag"></div>
+              <div class="col-toggle"></div>
+              <div class="col-status"></div>
+              <div class="col-nome-pai">
+                <span class="coluna-nome" data-i18n="app.list_header_name"
+                  >Nome</span
+                >
+              </div>
+              <div
+                class="col-episodios-pai"
+                data-i18n="app.list_header_episodes"
+              >
+                Episódios
+              </div>
+              <div class="col-acoes-pai"></div>
+            </div>
+            <div id="minhaLista"></div>
+          </div>
+        </div>
+        <iframe id="content-frame" class="hidden" src="about:blank"></iframe>
+      </div>
+    </div>
+
+    <div id="user-profile-dropdown" class="hidden">
+      <button id="btn-my-profile">
+        <i class="fas fa-user"></i>
+        <span data-i18n="app.my_profile">Meu Perfil</span>
+      </button>
+      <button id="btn-my-friends">
+        <i class="fas fa-users"></i>
+        <span data-i18n="app.nav_friends">Amigos</span>
+      </button>
+      <button id="btn-settings">
+        <i class="fas fa-gear"></i>
+        <span data-i18n="app.settings">Configurações</span>
+      </button>
+      <button id="btn-back-hub">
+        <i class="fas fa-list-ul"></i>
+        <span data-i18n="app.back_to_hub">Voltar para Listas</span>
+      </button>
+      <button id="btn-logout">
+        <i class="fas fa-right-from-bracket"></i>
+        <span data-i18n="app.logout">Sair</span>
+      </button>
+    </div>
+
+    <div id="options-dropdown" class="options-dropdown hidden">
+      <button id="btn-dropdown-favorite">
+        <i class="fas fa-star"></i>
+        <span data-i18n="app.favorite">Favoritar</span>
+      </button>
+      <button id="btn-dropdown-edit">
+        <i class="fas fa-pen"></i>
+        <span data-i18n="app.options_dropdown_edit">Editar</span>
+      </button>
+      <button id="btn-dropdown-delete">
+        <i class="fas fa-trash"></i>
+        <span data-i18n="app.options_dropdown_delete">Apagar</span>
+      </button>
+    </div>
+
+    <div id="sort-dropdown" class="hidden">
+      <button class="sort-option" data-sort="added" data-i18n="app.sort_added">
+        Por Colocação
+      </button>
+      <button
+        class="sort-option"
+        data-sort="personal"
+        data-i18n="app.sort_personal"
+      >
+        Ordem Pessoal
+      </button>
+      <button
+        class="sort-option"
+        data-sort="alpha-asc"
+        data-i18n="app.sort_alpha_asc"
+      >
+        Alfabética (A-Z)
+      </button>
+      <button
+        class="sort-option"
+        data-sort="alpha-desc"
+        data-i18n="app.sort_alpha_desc"
+      >
+        Alfabética (Z-A)
+      </button>
+      <button
+        class="sort-option"
+        data-sort="status"
+        data-i18n="app.sort_status"
+      >
+        Por Status
+      </button>
+    </div>
+
+    <div id="filter-dropdown" class="hidden">
+      <button
+        class="filter-option"
+        data-filter="todos"
+        data-i18n="app.filter_todos"
+      >
+        Todos
+      </button>
+      <button
+        class="filter-option"
+        data-filter="favoritos"
+        data-i18n="app.filter_favoritos"
+      >
+        Favoritos
+      </button>
+      <button
+        class="filter-option"
+        data-filter="nao-comecou"
+        data-i18n="app.filter_nao_comecou"
+      >
+        Não Assistido
+      </button>
+      <button
+        class="filter-option"
+        data-filter="assistindo"
+        data-i18n="app.filter_assistindo"
+      >
+        Assistindo
+      </button>
+      <button
+        class="filter-option"
+        data-filter="concluido"
+        data-i18n="app.filter_concluido"
+      >
+        Concluído
+      </button>
+      <button
+        class="filter-option"
+        data-filter="finished"
+        data-i18n="app.filter_finished"
+      >
+        Finalizado
+      </button>
+    </div>
+
+    <div id="modal-overlay" class="hidden">
+      <div id="custom-modal">
+        <h2 id="modal-title">Título</h2>
+        <p id="modal-message">Mensagem.</p>
+        <div id="modal-actions">
+          <button id="modal-btn-cancel" data-i18n="app.modal_cancel">
+            Cancelar
+          </button>
+          <button
+            id="modal-btn-confirm"
+            class="destructive"
+            data-i18n="app.modal_confirm"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="search-modal-overlay" class="hidden">
+      <div id="search-modal">
+        <div id="search-view">
+          <h2 data-i18n="app.add_modal_title">Adicionar Novo Item</h2>
+          <div class="search-modal-box">
+            <input
+              type="text"
+              id="search-modal-input"
+              data-i18n="[placeholder]app.add_modal_placeholder"
+            />
+            <button id="search-modal-btn"><i class="fas fa-search"></i></button>
+          </div>
+          <div id="search-modal-results"></div>
+        </div>
+        <div id="season-selection-view" class="hidden">
+          <h2 data-i18n="app.add_modal_seasons_title">Selecione as Partes</h2>
+          <p>
+            <span id="season-selection-subtitle-prefix"></span>
+            <strong id="selected-anime-title"></strong>
+            <span id="season-selection-subtitle-suffix"></span>
+          </p>
+          <div id="season-selection-list"></div>
+          <div class="modal-actions-footer">
+            <button id="mark-all-watched-btn" data-i18n="app.mark_all_button">
+              Marcar Tudo
+            </button>
+            <button
+              id="add-selected-seasons-btn"
+              data-i18n="app.add_modal_add_button"
+            >
+              Adicionar Item
+            </button>
+          </div>
+        </div>
+        <button
+          id="search-modal-close-btn"
+          data-i18n="app.details_modal_close_button"
+        >
+          Fechar
+        </button>
+      </div>
+    </div>
+
+    <div id="edit-modal-overlay" class="hidden">
+      <div id="edit-modal">
+        <div class="loading-overlay hidden">
+          <div class="spinner"></div>
+        </div>
+        <h2>
+          <span data-i18n="app.edit_modal_title">Editar Item:</span>
+          <span id="edit-anime-title"></span>
+        </h2>
+        <p data-i18n="app.edit_modal_subtitle">
+          Reordene, apague ou adicione novas partes.
+        </p>
+        <div id="edit-season-list"></div>
+        <div class="modal-actions-footer">
+          <div class="modal-actions-left">
+            <button
+              id="mark-all-watched-edit-btn"
+              data-i18n="app.mark_all_button"
+            >
+              Marcar Tudo
+            </button>
+            <button
+              id="check-new-seasons-btn"
+              data-i18n="app.edit_modal_check_seasons_button"
+            >
+              Verificar Novas Partes
+            </button>
+          </div>
+          <div class="modal-actions-right">
+            <button
+              id="edit-modal-cancel-btn"
+              data-i18n="app.edit_modal_cancel_button"
+            >
+              Cancelar
+            </button>
+            <button
+              id="edit-modal-save-btn"
+              data-i18n="app.edit_modal_save_button"
+            >
+              Salvar Alterações
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="details-modal-overlay" class="hidden">
+      <div id="details-modal">
+        <div id="details-modal-content"></div>
+        <button
+          id="details-modal-close-btn"
+          data-i18n="app.details_modal_close_button"
+        >
+          Fechar
+        </button>
+      </div>
+    </div>
+
+    <div id="status-modal-overlay" class="hidden">
+      <div id="status-modal">
+        <h2 id="status-modal-title" data-i18n="app.add_item_status_title">
+          Adicionar Item
+        </h2>
+        <p id="status-modal-message">Defina o status para <strong></strong>:</p>
+        <div id="status-modal-options">
+          <button
+            class="status-option-btn"
+            data-status="nao-comecou"
+            data-i18n="app.status_not_started_alt"
+          >
+            Não Lido/Jogado
+          </button>
+          <button
+            class="status-option-btn"
+            data-status="assistindo"
+            data-i18n="app.status_in_progress_alt"
+          >
+            Lendo/Jogando
+          </button>
+          <button
+            class="status-option-btn"
+            data-status="concluido"
+            data-i18n="app.status_completed_alt"
+          >
+            Finalizado
+          </button>
+        </div>
+        <button id="status-modal-cancel-btn" data-i18n="app.modal_cancel">
+          Cancelar
+        </button>
+      </div>
+    </div>
+
+    <div id="toast-notification" class="hidden"></div>
+
+    <div id="update-notification" class="hidden">
+      <p data-i18n="app.update_available">
+        Uma nova atualização está disponível!
+      </p>
+      <button id="update-now-btn" data-i18n="app.update_now_button">
+        Instalar Agora
+      </button>
+    </div>
+
+    <script src="../../node_modules/firebase/firebase-app-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-auth-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-firestore-compat.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/modal.js" type="module"></script>
+    <script src="../js/ui.js" type="module"></script>
+    <script src="../js/app.js" type="module"></script>
+  </body>
+</html>

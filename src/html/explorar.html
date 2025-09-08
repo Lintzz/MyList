@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/explorar.css" />
+  </head>
+  <body>
+    <div class="explore-container">
+      <div class="content-container">
+        <div class="search-controls">
+          <div class="search-container">
+            <i class="fas fa-magnifying-glass"></i>
+            <input
+              type="text"
+              id="explore-search-input"
+              data-i18n="[placeholder]app.explore_placeholder"
+            />
+            <button
+              id="explore-search-btn"
+              class="button-primary"
+              data-i18n="app.explore_search_button"
+            >
+              Pesquisar
+            </button>
+          </div>
+          <button
+            id="random-anime-btn"
+            class="button-secondary"
+            data-i18n="app.explore_random_button"
+          >
+            Anime Aleatório
+          </button>
+        </div>
+        <div id="explore-results-container">
+          <p class="placeholder-text" data-i18n="app.explore_initial_text">
+            Pesquise um anime ou clique em "Anime Aleatório" para começar.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="details-modal-overlay" class="hidden">
+      <div id="details-modal">
+        <div id="details-modal-content"></div>
+        <button
+          id="details-modal-close-btn"
+          data-i18n="app.details_modal_close_button"
+        >
+          Fechar
+        </button>
+      </div>
+    </div>
+
+    <script src="../js/explorar.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="confirm_register.title">Complete o seu Perfil</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="confirm-container">
+      <div class="confirm-box">
+        <h1 data-i18n="confirm_register.main_title">Quase lá!</h1>
+        <p data-i18n="confirm_register.subtitle">
+          Personalize o seu perfil para começar.
+        </p>
+
+        <div class="profile-picture-container">
+          <img
+            id="profile-pic-preview"
+            src="https://placehold.co/100x100/2C2C2C/E0E0E0?text=Foto"
+            alt="Pré-visualização da foto de perfil"
+          />
+        </div>
+
+        <div class="form-group">
+          <label
+            for="profile-pic-url-input"
+            data-i18n="confirm_register.image_link_label"
+            >Link da Imagem de Perfil</label
+          >
+          <input
+            type="text"
+            id="profile-pic-url-input"
+            data-i18n="[placeholder]confirm_register.image_link_placeholder"
+            placeholder="Cole o link da imagem aqui"
+          />
+        </div>
+
+        <div class="form-group">
+          <label
+            for="nickname-input"
+            data-i18n="confirm_register.nickname_label"
+            >Como gostaria de ser chamado?</label
+          >
+          <input
+            type="text"
+            id="nickname-input"
+            data-i18n="[placeholder]confirm_register.nickname_placeholder"
+            placeholder="O seu nome de utilizador"
+          />
+        </div>
+
+        <div class="form-group">
+          <label
+            for="username-input"
+            data-i18n="confirm_register.username_label"
+            >Nome de Usuário Único</label
+          >
+          <input
+            type="text"
+            id="username-input"
+            data-i18n="[placeholder]confirm_register.username_placeholder"
+            placeholder="Ex: lintz, felipe123 (sem espaços ou acentos)"
+          />
+        </div>
+
+        <button
+          id="save-profile-btn"
+          class="button-primary"
+          data-i18n="confirm_register.save_button"
+        >
+          Salvar e Entrar
+        </button>
+        <div id="status-message" class="hidden"></div>
+      </div>
+    </div>
+
+    <script src="../../node_modules/firebase/firebase-app-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-auth-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-firestore-compat.js"></script>
+
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/confirm-register.js" type="module"></script>
+  </body>
+</html>

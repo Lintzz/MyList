@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/explorar.css" />
+  </head>
+  <body>
+    <div class="explore-container">
+      <div class="content-container">
+        <h1 style="text-align: center" data-i18n="app.trends_title">
+          Animes em Alta
+        </h1>
+        <div id="explore-results-container">
+          <p class="placeholder-text" data-i18n="app.trends_loading">
+            A carregar animes em alta...
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="details-modal-overlay" class="hidden">
+      <div id="details-modal">
+        <div id="details-modal-content"></div>
+        <button
+          id="details-modal-close-btn"
+          data-i18n="app.details_modal_close_button"
+        >
+          Fechar
+        </button>
+      </div>
+    </div>
+
+    <script src="../js/tendencias.js" type="module"></script>
+  </body>
+</html>

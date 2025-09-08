@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' app: https://www.gstatic.com https://apis.google.com;"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="login.title">Login</title>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div id="title-bar">
+      <div id="drag-region"></div>
+      <div id="window-controls">
+        <button id="minimize-btn" data-i18n="[title]window.minimize">_</button>
+        <button id="maximize-btn" data-i18n="[title]window.maximize">☐</button>
+        <button id="close-btn" data-i18n="[title]window.close">✕</button>
+      </div>
+    </div>
+
+    <div class="login-container hidden">
+      <div class="login-box">
+        <h1 data-i18n="login.title">Minha Lista</h1>
+        <p data-i18n="login.subtitle">
+          Acesse as suas listas de qualquer lugar.
+        </p>
+        <button id="google-login-btn">
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            alt="Google icon"
+          />
+          <span data-i18n="login.login_button">Entrar com Google</span>
+        </button>
+        <div id="login-status" class="hidden"></div>
+      </div>
+    </div>
+
+    <script src="../../node_modules/firebase/firebase-app-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-auth-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-firestore-compat.js"></script>
+
+    <!-- SCRIPTS DO FIREBASE (VIA CDN) -->
+    <!-- <script src="https://www.gstatic.com/firebasejs/12.2.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.0/firebase-firestore-compat.js"></script> -->
+
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/login.js" type="module"></script>
+  </body>
+</html>

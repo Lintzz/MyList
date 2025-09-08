@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="hub.page_title">Minhas Listas</title>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/hub.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div id="title-bar">
+      <div
+        id="user-profile-area"
+        class="loading-skeleton"
+        data-i18n="[title]app.user_menu_tooltip"
+      >
+        <div class="skeleton skeleton-avatar"></div>
+        <div class="skeleton skeleton-text"></div>
+        <img
+          id="user-avatar"
+          src="https://placehold.co/40x40/1f1f1f/ffffff?text=U"
+          alt="Avatar do utilizador"
+        />
+        <span id="user-nickname">Utilizador</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div id="drag-region"></div>
+      <div id="window-controls">
+        <button id="minimize-btn" data-i18n="[title]window.minimize">_</button>
+        <button id="maximize-btn" data-i18n="[title]window.maximize">☐</button>
+        <button id="close-btn" data-i18n="[title]window.close">✕</button>
+      </div>
+    </div>
+
+    <div class="hub-container">
+      <div class="welcome-header">
+        <h1 data-i18n="hub.welcome_title">Bem-vindo(a) de volta!</h1>
+        <p data-i18n="hub.welcome_subtitle">O que vamos organizar hoje?</p>
+      </div>
+      <div class="list-selection-container">
+        <button class="list-card" data-list-type="anime">
+          <i class="fas fa-tv"></i>
+          <span data-i18n="hub.card_anime">Animes</span>
+        </button>
+        <button class="list-card" data-list-type="manga">
+          <i class="fas fa-book-open"></i>
+          <span data-i18n="hub.card_manga">Mangás</span>
+        </button>
+        <button class="list-card" data-list-type="movies">
+          <i class="fas fa-film"></i>
+          <span data-i18n="hub.card_movies">Filmes</span>
+        </button>
+        <button class="list-card" data-list-type="series">
+          <i class="fas fa-video"></i>
+          <span data-i18n="hub.card_series">Séries</span>
+        </button>
+        <button class="list-card" data-list-type="comics">
+          <i class="fas fa-book-dead"></i>
+          <span data-i18n="hub.card_comics">HQs</span>
+        </button>
+        <button class="list-card" data-list-type="books">
+          <i class="fas fa-book"></i>
+          <span data-i18n="hub.card_books">Livros</span>
+        </button>
+        <button class="list-card" data-list-type="games">
+          <i class="fas fa-gamepad"></i>
+          <span data-i18n="hub.card_games">Games</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="user-profile-dropdown" class="hidden">
+      <button id="btn-my-profile">
+        <i class="fas fa-user"></i>
+        <span data-i18n="app.my_profile">Meu Perfil</span>
+      </button>
+      <button id="btn-my-friends">
+        <i class="fas fa-users"></i>
+        <span data-i18n="app.nav_friends">Amigos</span>
+      </button>
+      <button id="btn-settings">
+        <i class="fas fa-gear"></i>
+        <span data-i18n="app.settings">Configurações</span>
+      </button>
+      <button id="btn-logout">
+        <i class="fas fa-right-from-bracket"></i>
+        <span data-i18n="app.logout">Sair</span>
+      </button>
+    </div>
+
+    <div id="modal-overlay" class="hidden">
+      <div id="custom-modal">
+        <h2 id="modal-title">Título</h2>
+        <p id="modal-message">Mensagem.</p>
+        <div id="modal-actions">
+          <button id="modal-btn-cancel">Cancelar</button>
+          <button id="modal-btn-confirm" class="destructive">Confirmar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../node_modules/firebase/firebase-app-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-auth-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-firestore-compat.js"></script>
+
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/hub.js" type="module"></script>
+    <script src="../js/modal.js" type="module"></script>
+  </body>
+</html>
