@@ -22,6 +22,7 @@ let lastActiveView = null;
 let initialTabOnLoad = null;
 let userIdToView = null;
 let navigationHistory = [];
+let updateWindow = null;
 
 const apiCache = new Map();
 const CACHE_DURATION = 10 * 60 * 1000;
@@ -76,11 +77,13 @@ if (!gotTheLock) {
 
 function createPatchNotesWindow() {
   const patchNotesWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 830,
+    height: 900,
     title: "Novidades da Versão",
     icon: path.join(__dirname, "src/assets/icon.ico"),
     autoHideMenuBar: true,
+    parent: mainWindow,
+    modal: true,
   });
   patchNotesWindow.loadFile(path.join(__dirname, "src/html/patch-notes.html"));
 }
@@ -121,13 +124,86 @@ function createWindow() {
   }
 }
 
+function createUpdateWindow() {
+  if (updateWindow) {
+    updateWindow.focus();
+    return;
+  }
+
+  const parentBounds = mainWindow.getBounds();
+  const modalWidth = 500;
+  const modalHeight = 150;
+
+  updateWindow = new BrowserWindow({
+    width: modalWidth,
+    height: modalHeight,
+    x: Math.round(parentBounds.x + parentBounds.width / 2 - modalWidth / 2),
+    y: Math.round(parentBounds.y + parentBounds.height - modalHeight - 20), // 20px de margem do fundo
+    parent: mainWindow,
+    modal: false,
+    frame: false,
+    transparent: true,
+    show: false,
+    resizable: false,
+    movable: false,
+    alwaysOnTop: true,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+    },
+  });
+
+  updateWindow.loadFile(path.join(__dirname, "src/html/update-modal.html"));
+
+  // Reposiciona a notificação se a janela principal for movida
+  const onMove = () => {
+    if (updateWindow && !updateWindow.isDestroyed()) {
+      const newParentBounds = mainWindow.getBounds();
+      updateWindow.setBounds({
+        x: Math.round(
+          newParentBounds.x + newParentBounds.width / 2 - modalWidth / 2
+        ),
+        y: Math.round(
+          newParentBounds.y + newParentBounds.height - modalHeight - 20
+        ),
+      });
+    }
+  };
+  mainWindow.on("move", onMove);
+
+  updateWindow.webContents.on("did-finish-load", async () => {
+    const settingsFilePath = path.join(
+      app.getPath("userData"),
+      "settings.json"
+    );
+    let settings = {};
+    try {
+      if (fs.existsSync(settingsFilePath)) {
+        settings = JSON.parse(fs.readFileSync(settingsFilePath, "utf8"));
+      }
+    } catch (error) {
+      log.error("Could not read settings file for update modal", error);
+    }
+    updateWindow.webContents.send("update-modal-info", settings);
+  });
+
+  updateWindow.once("ready-to-show", () => {
+    updateWindow.show();
+  });
+
+  updateWindow.on("closed", () => {
+    mainWindow.removeListener("move", onMove); // Remove o listener para evitar memory leaks
+    updateWindow = null;
+  });
+}
+
 app.whenReady().then(() => {
   createWindow();
-  autoUpdater.checkForUpdatesAndNotify().then((updateInfo) => {
-    if (updateInfo) {
-      log.info("Update available and will be downloaded.", updateInfo);
-    }
-  });
+  autoUpdater.checkForUpdates();
+
+  // setTimeout(() => {
+  //   log.info("Disparando evento de atualização para teste...");
+  //   autoUpdater.emit("update-downloaded");
+  // }, 5000); // Dispara após 5 segundos
 
   const userDataPath = app.getPath("userData");
   const lastVersionPath = path.join(userDataPath, "last-version.txt");
@@ -152,6 +228,9 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
+  if (updateWindow) {
+    updateWindow.close();
+  }
   if (process.platform !== "darwin") {
     app.quit();
   }
@@ -164,10 +243,18 @@ app.on("activate", () => {
 });
 
 autoUpdater.on("update-downloaded", () => {
-  log.info("Atualização baixada, notificação enviada para o renderer.");
-  if (mainWindow) {
-    mainWindow.webContents.send("update-ready");
+  log.info("Update downloaded; creating update modal window.");
+  createUpdateWindow();
+});
+
+ipcMain.on("close-update-modal", () => {
+  if (updateWindow) {
+    updateWindow.close();
   }
+});
+
+ipcMain.on("install-update", () => {
+  autoUpdater.quitAndInstall();
 });
 
 // --- Lógica de Navegação, Controlo de Janela e APIs ---

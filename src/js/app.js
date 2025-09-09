@@ -1529,15 +1529,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     window.electronAPI.onUpdateReady(() => {
-      updateNotification.classList.remove("hidden");
-      setTimeout(() => updateNotification.classList.add("visible"), 10);
+      showConfirmationModal(
+        t("app.update_available"),
+        "Uma nova versão do MyList está pronta para ser instalada.",
+        () => {
+          window.electronAPI.quitAndInstallUpdate();
+        },
+        false,
+        t("app.update_now_button")
+      );
     });
-
-    if (updateNowBtn) {
-      updateNowBtn.addEventListener("click", () => {
-        window.electronAPI.quitAndInstallUpdate();
-      });
-    }
   } catch (error) {
     console.error("Erro no DOMContentLoaded do app.js:", error);
     showErrorModal(

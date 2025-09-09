@@ -76,10 +76,14 @@ export function renderizarLista(
   if (listaItems.length === 0) {
     const emptyListHTML = `
       <div class="empty-list-container">
-        <p>${t("app.empty_list")}</p>
         <button id="add-from-empty-btn" class="button-primary">
           <i class="fas fa-plus"></i> Adicionar Item
         </button>
+        </br>
+        </br>
+        </br>
+        </br>
+        <p>${t("app.empty_list")}</p>
       </div>
     `;
     containerElement.innerHTML = emptyListHTML;

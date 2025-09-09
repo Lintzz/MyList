@@ -1366,10 +1366,9 @@
 .empty-list-container {
   text-align: center;
   color: var(--secondary-text-color);
-  padding: 40px 20px;
+  padding: 10px 0px;
 }
 .empty-list-container button {
-  margin-top: 15px;
   padding: 10px 20px;
   font-size: 1em;
   display: inline-flex;

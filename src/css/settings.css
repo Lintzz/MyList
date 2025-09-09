@@ -114,7 +114,7 @@
   opacity: 0.85;
 }
 .button-settings.destructive {
-  background-color: var(--destructive-color);
+  background-color: var(--accent-color);
   color: white;
 }
 .form-group {
@@ -199,7 +199,7 @@ input:checked + .slider:before {
   color: var(--primary-text-color);
 }
 #modal-btn-confirm.destructive {
-  background-color: var(--destructive-color);
+  background-color: var(--accent-color);
   color: white;
 }
 

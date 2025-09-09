@@ -76,6 +76,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
   maximizeWindow: () => ipcRenderer.send("maximize-window"),
   closeWindow: () => ipcRenderer.send("close-window"),
 
+  // Funções do Modal de Atualização
+  onUpdateModalInfo: (callback) =>
+    ipcRenderer.on("update-modal-info", (event, info) => callback(info)),
+  closeUpdateModal: () => ipcRenderer.send("close-update-modal"),
+  installUpdate: () => ipcRenderer.send("install-update"),
+
   // Atualizações do App
   onUpdateReady: (callback) => ipcRenderer.on("update-ready", () => callback()),
   quitAndInstallUpdate: () => ipcRenderer.send("quit-and-install-update"),

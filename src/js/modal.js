@@ -6,15 +6,26 @@ const modalBtnCancel = document.getElementById("modal-btn-cancel");
 
 let confirmCallback = null;
 
-export function showConfirmationModal(title, message, onConfirm) {
+export function showConfirmationModal(
+  title,
+  message,
+  onConfirm,
+  isDestructive = true,
+  confirmText = "Confirmar"
+) {
   modalTitle.textContent = title;
   modalMessage.innerHTML = message;
   confirmCallback = onConfirm;
 
   modalBtnConfirm.style.display = "inline-block";
   modalBtnCancel.style.display = "inline-block";
-  modalBtnConfirm.textContent = "Confirmar";
-  modalBtnConfirm.classList.add("destructive");
+  modalBtnConfirm.textContent = confirmText;
+
+  if (isDestructive) {
+    modalBtnConfirm.classList.add("destructive");
+  } else {
+    modalBtnConfirm.classList.remove("destructive");
+  }
 
   modalOverlay.classList.remove("hidden");
   setTimeout(() => modalOverlay.classList.add("visible"), 10);
