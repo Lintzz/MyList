@@ -287,11 +287,15 @@ export function renderizarListaEdicao(
       ? `<input type="text" class="edit-season-title-input" value="${temporada.title}">`
       : `<strong title="${temporada.title}">${temporada.title}</strong>`;
 
+    // CORREÇÃO APLICADA AQUI
     const episodesField = isCustom
-      ? `<input type="number" class="episode-input-total" value="${
+      ? `<span class="episode-total-barra">/</span><input type="number" class="episode-input-total" value="${
           temporada.episodes || 0
         }" min="0">`
       : `<span class="episode-total">/ ${temporada.episodes || "?"}</span>`;
+
+    const maxVal = temporada.episodes || 0;
+    const maxAttr = maxVal > 0 ? `max="${maxVal}"` : 'maxlength="4"';
 
     const li = document.createElement("li");
     li.className = "edit-season-item";
@@ -303,7 +307,7 @@ export function renderizarListaEdicao(
                         <button class="quick-edit-btn decrement-btn-edit">-</button>
                         <input type="number" class="episode-input" value="${
                           temporada.watched_episodes || 0
-                        }" min="0" maxlength="4">
+                        }" min="0" ${maxAttr}>
                         ${episodesField}
                         <button class="quick-edit-btn increment-btn-edit">+</button>
                     </div>

@@ -16,40 +16,11 @@ import { seriesService } from "./services/series-service.js";
 import { booksService } from "./services/books-service.js";
 import { comicsService } from "./services/comics-service.js";
 import { gamesService } from "./services/games-service.js";
+import { applyTranslations } from "./views/view-helper.js";
 
 let auth, db;
 
 window.mudarAba = mudarAba;
-
-async function applyTranslations(lang) {
-  const response = await fetch(`../locales/${lang}.json`);
-  const translations = await response.json();
-
-  function translate(key, options = {}) {
-    let text =
-      key.split(".").reduce((obj, i) => (obj ? obj[i] : null), translations) ||
-      key;
-    for (const option in options) {
-      text = text.replace(`{{${option}}}`, options[option]);
-    }
-    return text;
-  }
-
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
-    const key = element.getAttribute("data-i18n");
-    if (key.startsWith("[") && key.includes("]")) {
-      const match = key.match(/\[(.*?)\](.*)/);
-      if (match) {
-        const attr = match[1];
-        const actualKey = match[2];
-        element.setAttribute(attr, translate(actualKey));
-      }
-    } else {
-      element.innerHTML = translate(key);
-    }
-  });
-  return translate;
-}
 
 async function mudarAba(content) {
   const topNav = document.querySelector(".top-nav");

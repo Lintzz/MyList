@@ -1,27 +1,6 @@
+import { applyTranslations } from "./views/view-helper.js";
+
 let auth, db, currentUser, t;
-
-async function applyTranslations(lang) {
-  const response = await fetch(`../locales/${lang}.json`);
-  const translations = await response.json();
-  const translateFn = (key) =>
-    key.split(".").reduce((obj, i) => obj?.[i], translations) || key;
-
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
-    const key = element.getAttribute("data-i18n");
-    if (key.startsWith("[") && key.includes("]")) {
-      const match = key.match(/\[(.*?)\](.*)/);
-      if (match) {
-        const attr = match[1];
-        const actualKey = match[2];
-        element.setAttribute(attr, translateFn(actualKey));
-      }
-    } else {
-      element.innerHTML = translateFn(key);
-    }
-  });
-
-  return translateFn;
-}
 
 // --- Funções de Lógica do Firestore ---
 async function searchUsersInDB(currentUserId, username) {
