@@ -28,6 +28,9 @@ async function applyTranslations(lang) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // A janela já é mostrada pelo main.js com a tela de loading do HTML
+  window.electronAPI.readyToShow();
+
   const firebaseReady = await window.firebaseInitializationPromise;
   if (!firebaseReady) {
     return;
@@ -49,13 +52,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const maximizeBtn = document.getElementById("maximize-btn");
   const closeBtn = document.getElementById("close-btn");
   const loginContainer = document.querySelector(".login-container");
+  const loadingScreen = document.getElementById("loading-screen");
 
   auth.onAuthStateChanged((user) => {
     if (user) {
+      // O usuário está logado, a tela de loading permanece e ele será redirecionado
       checkAndRedirectUser(user);
     } else {
+      // O usuário não está logado, esconde o loading e mostra o formulário de login
+      loadingScreen.classList.add("hidden");
       loginContainer.classList.remove("hidden");
-      window.electronAPI.readyToShow();
     }
   });
 
@@ -70,6 +76,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
     try {
+      loadingScreen.classList.remove("hidden");
+      loginContainer.classList.add("hidden");
       loginStatus.textContent = t("login.status_authenticating");
       const urlParams = new URLSearchParams(new URL(url).search);
       const idToken = urlParams.get("idToken");
@@ -83,6 +91,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         "{{message}}",
         error.message
       );
+      loadingScreen.classList.add("hidden");
+      loginContainer.classList.remove("hidden");
     }
   });
 

@@ -75,6 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const btnImport = document.getElementById("btn-import");
     const btnExport = document.getElementById("btn-export");
     const btnGithub = document.getElementById("btn-github");
+    const btnChangelog = document.getElementById("btn-changelog");
     const modalOverlay = document.getElementById("modal-overlay");
     const modalTitle = document.getElementById("modal-title");
     const modalMessage = document.getElementById("modal-message");
@@ -295,6 +296,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnGithub.addEventListener("click", () =>
         window.electronAPI.openExternalLink("https://github.com/Lintzz")
       );
+      btnChangelog.addEventListener("click", () => {
+        window.electronAPI.navigateToChangelog();
+      });
 
       modalBtnCancel.addEventListener("click", hideModal);
 

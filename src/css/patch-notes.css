@@ -1,0 +1,133 @@
+/* Estilos para as janelas de Patch Notes e Histórico */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--primary-text-color);
+  margin: 0;
+  padding: 25px;
+  line-height: 1.6;
+}
+.container {
+  max-width: 750px;
+  margin: 0 auto;
+  background-color: var(--surface-color);
+  padding: 20px 40px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  /* Garante que o container ocupe a altura para a scrollbar aparecer */
+  height: calc(100vh - 50px);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+h1,
+h2,
+h4 {
+  color: var(--primary-text-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+h1 {
+  text-align: center;
+  font-size: 1.8em;
+  color: var(--accent-color);
+}
+h2 {
+  font-size: 1.5em;
+  margin-top: 30px;
+}
+h4 {
+  font-size: 1.2em;
+  margin-top: 30px;
+  border-bottom: none;
+}
+ul {
+  padding-left: 20px;
+  color: var(--secondary-text-color);
+  list-style: none;
+}
+li {
+  margin-bottom: 12px;
+  position: relative;
+  padding-left: 25px;
+}
+li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--success-color);
+  font-weight: bold;
+}
+strong {
+  color: var(--primary-text-color);
+}
+.highlight {
+  background-color: var(--accent-color);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.85em;
+  margin-right: 8px;
+}
+.close-btn,
+.back-btn {
+  display: block;
+  width: 150px;
+  margin: 40px auto 10px;
+  padding: 12px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: opacity 0.2s;
+  text-decoration: none;
+}
+.close-btn:hover,
+.back-btn:hover {
+  opacity: 0.9;
+}
+
+/* Estilos específicos para o historico.html */
+.back-btn {
+  background-color: var(--button-bg-color);
+  color: var(--primary-text-color);
+  border: 1px solid var(--border-color);
+}
+.version-block {
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--border-color);
+}
+.version-block:last-of-type {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+/* --- ESTILOS DA SCROLLBAR ADICIONADOS --- */
+.container::-webkit-scrollbar {
+  width: 8px;
+}
+.container::-webkit-scrollbar-track {
+  background: var(--surface-highlight-color);
+  border-radius: 10px;
+}
+.container::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+.container::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* Para garantir a consistência com o tema claro, se aplicável */
+[data-theme="theme-light"] .container::-webkit-scrollbar-thumb {
+  background: #adb5bd;
+}
+[data-theme="theme-light"] .container::-webkit-scrollbar-thumb:hover {
+  background: #89939e;
+}

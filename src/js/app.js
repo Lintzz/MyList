@@ -104,6 +104,14 @@ async function mudarAba(content) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const loadingScreen = document.getElementById("loading-screen");
+  const appContent = document.getElementById("app-content");
+
+  // Mostra a tela de loading imediatamente
+  loadingScreen.classList.remove("hidden");
+  appContent.classList.add("hidden");
+  window.electronAPI.readyToShow();
+
   const firebaseReady = await window.firebaseInitializationPromise;
   if (!firebaseReady) return;
 
@@ -151,8 +159,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const lang = currentSettings.language || "pt";
     const t = await applyTranslations(lang);
 
-    const loadingScreen = document.getElementById("loading-screen");
-    const appContent = document.getElementById("app-content");
     const minhaListaContainer = document.getElementById("minhaLista");
     const mostrarFormBtn = document.getElementById("mostrarFormBtn");
     const pesquisaInput = document.getElementById("pesquisaInput");
@@ -277,7 +283,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     auth.onAuthStateChanged((user) => {
       if (user) {
         currentUser = user;
-        mostrarConteudoPrincipal();
         iniciarCarregamentoDeDados();
       } else {
         window.electronAPI.navigateToMain();
@@ -364,9 +369,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     function mostrarConteudoPrincipal() {
-      loadingScreen.style.display = "none";
+      loadingScreen.classList.add("hidden");
       appContent.classList.remove("hidden");
-      window.electronAPI.readyToShow();
     }
 
     async function iniciarCarregamentoDeDados() {
@@ -384,6 +388,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           ? Math.max(...listaCompleta.map((a) => a.id || 0)) + 1
           : 1;
       filtrarESortearERenderizarLista();
+
+      // Agora que os dados foram carregados, esconde a tela de loading e mostra o conteúdo
+      mostrarConteudoPrincipal();
     }
 
     function filtrarESortearERenderizarLista() {
@@ -1663,12 +1670,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
     });
 
-    addCustomItemBtn.addEventListener("click", abrirModalItemPersonalizado);
+    addCustomItemBtn.addEventListener("click", () =>
+      abrirModalItemPersonalizado(t)
+    );
     customItemCancelBtn.addEventListener("click", fecharModalItemPersonalizado);
     customItemSaveBtn.addEventListener("click", salvarItemPersonalizado);
 
-    function abrirModalItemPersonalizado() {
-      gerarFormularioItemPersonalizado();
+    function abrirModalItemPersonalizado(t) {
+      gerarFormularioItemPersonalizado(t);
       customItemModalOverlay.classList.remove("hidden");
       setTimeout(() => customItemModalOverlay.classList.add("visible"), 10);
     }
@@ -1678,18 +1687,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       setTimeout(() => customItemModalOverlay.classList.add("hidden"), 200);
     }
 
-    function gerarFormularioItemPersonalizado() {
+    function gerarFormularioItemPersonalizado(t) {
       let formHtml = `
             <div class="form-group">
-                <label>Título</label>
+                <label>${t("app.custom_item_title_label")}</label>
                 <input type="text" id="custom-title" required>
             </div>
             <div class="form-group">
-                <label>URL da Imagem (Capa)</label>
+                <label>${t("app.custom_item_image_url_label")}</label>
                 <input type="text" id="custom-image-url">
             </div>
             <div class="form-group">
-                <label>Sinopse</label>
+                <label>${t("app.custom_item_synopsis_label")}</label>
                 <textarea id="custom-synopsis" rows="3"></textarea>
             </div>
         `;
@@ -1700,15 +1709,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentMediaType === "comics" ||
         currentMediaType === "manga"
       ) {
-        const label =
+        const labelKey =
           currentMediaType === "comics"
-            ? "Editora"
+            ? "app.custom_item_publisher_label"
             : currentMediaType === "manga"
-            ? "Autor"
-            : "Autor/Desenvolvedor";
+            ? "app.custom_item_author_label"
+            : "app.custom_item_developer_label";
         formHtml += `
                 <div class="form-group">
-                    <label>${label}</label>
+                    <label>${t(labelKey)}</label>
                     <input type="text" id="custom-author">
                 </div>
             `;
@@ -1721,14 +1730,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       ) {
         formHtml += `
                 <div id="custom-item-seasons-container">
-                    <h4>Temporadas/Partes</h4>
+                    <h4>${t("app.custom_item_seasons_title")}</h4>
                     <div id="custom-seasons-list">
                         <div class="custom-season-item">
-                            <input type="text" placeholder="Nome da Temporada/Parte 1" class="custom-season-title">
-                            <input type="number" placeholder="Eps" class="custom-season-eps" min="0">
+                            <input type="text" placeholder="${t(
+                              "app.custom_item_season_placeholder",
+                              { count: 1 }
+                            )}" class="custom-season-title">
+                            <input type="number" placeholder="${t(
+                              "app.custom_item_episodes_placeholder"
+                            )}" class="custom-season-eps" min="0">
                         </div>
                     </div>
-                    <button type="button" id="add-season-btn">Adicionar Temporada</button>
+                    <button type="button" id="add-season-btn">${t(
+                      "app.custom_item_add_season_button"
+                    )}</button>
                 </div>
             `;
       }
@@ -1744,8 +1760,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             const newSeasonItem = document.createElement("div");
             newSeasonItem.className = "custom-season-item";
             newSeasonItem.innerHTML = `
-                    <input type="text" placeholder="Nome da Temporada/Parte ${seasonCount}" class="custom-season-title">
-                    <input type="number" placeholder="Eps" class="custom-season-eps" min="0">
+                    <input type="text" placeholder="${t(
+                      "app.custom_item_season_placeholder",
+                      { count: seasonCount }
+                    )}" class="custom-season-title">
+                    <input type="number" placeholder="${t(
+                      "app.custom_item_episodes_placeholder"
+                    )}" class="custom-season-eps" min="0">
                 `;
             seasonsList.appendChild(newSeasonItem);
           });

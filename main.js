@@ -82,10 +82,18 @@ function createPatchNotesWindow() {
     title: "Novidades da Versão",
     icon: path.join(__dirname, "src/assets/icon.ico"),
     autoHideMenuBar: true,
+    frame: false,
     parent: mainWindow,
     modal: true,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+    },
   });
   patchNotesWindow.loadFile(path.join(__dirname, "src/html/patch-notes.html"));
+  patchNotesWindow.once("ready-to-show", () => {
+    patchNotesWindow.show();
+  });
 }
 
 function createWindow() {
@@ -114,6 +122,13 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, "src/html/login.html"));
 
+  mainWindow.webContents.once("dom-ready", () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.show();
+    }
+    autoUpdater.checkForUpdates();
+  });
+
   const deepLinkOnStartup = process.argv.find((arg) =>
     arg.startsWith("minha-lista://")
   );
@@ -138,7 +153,7 @@ function createUpdateWindow() {
     width: modalWidth,
     height: modalHeight,
     x: Math.round(parentBounds.x + parentBounds.width / 2 - modalWidth / 2),
-    y: Math.round(parentBounds.y + parentBounds.height - modalHeight - 20), // 20px de margem do fundo
+    y: Math.round(parentBounds.y + parentBounds.height - modalHeight - 20),
     parent: mainWindow,
     modal: false,
     frame: false,
@@ -154,7 +169,6 @@ function createUpdateWindow() {
 
   updateWindow.loadFile(path.join(__dirname, "src/html/update-modal.html"));
 
-  // Reposiciona a notificação se a janela principal for movida
   const onMove = () => {
     if (updateWindow && !updateWindow.isDestroyed()) {
       const newParentBounds = mainWindow.getBounds();
@@ -191,40 +205,34 @@ function createUpdateWindow() {
   });
 
   updateWindow.on("closed", () => {
-    mainWindow.removeListener("move", onMove); // Remove o listener para evitar memory leaks
+    mainWindow.removeListener("move", onMove);
     updateWindow = null;
   });
 }
 
 app.whenReady().then(() => {
   createWindow();
-  autoUpdater.checkForUpdates();
-
-  // setTimeout(() => {
-  //   log.info("Disparando evento de atualização para teste...");
-  //   autoUpdater.emit("update-downloaded");
-  // }, 5000); // Dispara após 5 segundos
 
   const userDataPath = app.getPath("userData");
   const lastVersionPath = path.join(userDataPath, "last-version.txt");
 
-  try {
-    const currentVersion = app.getVersion();
-    if (fs.existsSync(lastVersionPath)) {
-      const lastVersion = fs.readFileSync(lastVersionPath, "utf8");
-      if (currentVersion !== lastVersion) {
+  mainWindow.once("ready-to-show", () => {
+    try {
+      const currentVersion = app.getVersion();
+      if (fs.existsSync(lastVersionPath)) {
+        const lastVersion = fs.readFileSync(lastVersionPath, "utf8");
+        if (currentVersion !== lastVersion) {
+          createPatchNotesWindow();
+          fs.writeFileSync(lastVersionPath, currentVersion, "utf8");
+        }
+      } else {
         createPatchNotesWindow();
         fs.writeFileSync(lastVersionPath, currentVersion, "utf8");
       }
-    } else {
-      // É a primeira vez que a aplicação corre com esta lógica,
-      // mostra as notas e guarda a versão.
-      createPatchNotesWindow();
-      fs.writeFileSync(lastVersionPath, currentVersion, "utf8");
+    } catch (err) {
+      log.error("Failed to handle version check for patch notes:", err);
     }
-  } catch (err) {
-    log.error("Failed to handle version check for patch notes:", err);
-  }
+  });
 });
 
 app.on("window-all-closed", () => {
@@ -257,8 +265,6 @@ ipcMain.on("install-update", () => {
   autoUpdater.quitAndInstall();
 });
 
-// --- Lógica de Navegação, Controlo de Janela e APIs ---
-// (Todo o resto do seu main.js permanece igual a partir daqui)
 function navigateTo(win, file, clearHistory = false) {
   if (!win) return;
   const currentURL = win.webContents.getURL();
@@ -274,9 +280,11 @@ function navigateTo(win, file, clearHistory = false) {
 }
 
 ipcMain.on("quit-and-install-update", () => autoUpdater.quitAndInstall());
+
 ipcMain.on("ready-to-show", () => {
-  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.show();
+  log.info("Content is ready to be shown.");
 });
+
 ipcMain.on("open-external-link", (event, url) => shell.openExternal(url));
 
 ipcMain.on("navigate-to-hub", (event) => {
@@ -309,6 +317,27 @@ ipcMain.on("navigate-to-settings", (event) => {
     BrowserWindow.fromWebContents(event.sender),
     "src/html/settings.html"
   );
+});
+
+ipcMain.on("navigate-to-changelog", (event) => {
+  const changelogWindow = new BrowserWindow({
+    width: 830,
+    height: 900,
+    title: "Histórico de Versões",
+    icon: path.join(__dirname, "src/assets/icon.ico"),
+    autoHideMenuBar: true,
+    parent: mainWindow,
+    modal: true,
+    frame: false,
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+    },
+  });
+  changelogWindow.loadFile(path.join(__dirname, "src/html/historico.html"));
+  changelogWindow.once("ready-to-show", () => {
+    changelogWindow.show();
+  });
 });
 
 ipcMain.on("navigate-to-profile", (event) => {

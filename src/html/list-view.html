@@ -139,7 +139,7 @@
               <button
                 id="add-custom-item-btn"
                 class="botao-add"
-                title="Adicionar item manualmente"
+                data-i18n="[title]app.add_custom_item_tooltip"
               >
                 <i class="fas fa-pen"></i>
               </button>
@@ -374,11 +374,15 @@
           <span data-i18n="app.edit_modal_title">Editar Item:</span>
         </h2>
         <div class="form-group">
-          <label for="edit-title-input">Título</label>
+          <label for="edit-title-input" data-i18n="app.edit_modal_title_label"
+            >Título</label
+          >
           <input type="text" id="edit-title-input" />
         </div>
         <div class="form-group" id="edit-author-group">
-          <label for="edit-author-input">Autor/Editora</label>
+          <label for="edit-author-input" data-i18n="app.edit_modal_author_label"
+            >Autor/Editora</label
+          >
           <input type="text" id="edit-author-input" />
         </div>
         <p data-i18n="app.edit_modal_subtitle" id="edit-seasons-subtitle">
@@ -427,11 +431,19 @@
 
     <div id="custom-item-modal-overlay" class="hidden">
       <div id="custom-item-modal">
-        <h2>Adicionar Item Personalizado</h2>
+        <h2 data-i18n="app.custom_item_modal_title">
+          Adicionar Item Personalizado
+        </h2>
         <div id="custom-item-form-container"></div>
         <div class="modal-actions-footer">
-          <button id="custom-item-cancel-btn">Cancelar</button>
-          <button id="custom-item-save-btn" class="button-primary">
+          <button id="custom-item-cancel-btn" data-i18n="app.modal_cancel">
+            Cancelar
+          </button>
+          <button
+            id="custom-item-save-btn"
+            class="button-primary"
+            data-i18n="app.custom_item_save_button"
+          >
             Salvar Item
           </button>
         </div>

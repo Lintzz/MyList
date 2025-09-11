@@ -4,98 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="patch_notes.title">Novidades da Versão</title>
-    <style>
-      /* Estilos baseados no seu global.css para consistência */
-      :root {
-        --bg-color: #121212;
-        --surface-color: #1e1e1e;
-        --primary-text-color: #e0e0e0;
-        --secondary-text-color: #a0a0a0;
-        --accent-color: #007bff;
-        --border-color: #383838;
-        --success-color: #28a745;
-        --warning-color: #fd7e14;
-      }
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
-        background-color: var(--bg-color);
-        color: var(--primary-text-color);
-        margin: 0;
-        padding: 25px;
-        line-height: 1.6;
-      }
-      .container {
-        max-width: 750px;
-        margin: 0 auto;
-        background-color: var(--surface-color);
-        padding: 20px 40px;
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-      }
-      h1,
-      h2 {
-        color: var(--primary-text-color);
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 10px;
-      }
-      h1 {
-        text-align: center;
-        font-size: 1.8em;
-        color: var(--accent-color);
-      }
-      h2 {
-        font-size: 1.4em;
-        margin-top: 30px;
-      }
-      ul {
-        padding-left: 20px;
-        color: var(--secondary-text-color);
-        list-style: none;
-      }
-      li {
-        margin-bottom: 12px;
-        position: relative;
-        padding-left: 25px;
-      }
-      li::before {
-        content: "✓";
-        position: absolute;
-        left: 0;
-        color: var(--success-color);
-        font-weight: bold;
-      }
-      strong {
-        color: var(--primary-text-color);
-      }
-      .highlight {
-        background-color: var(--accent-color);
-        color: white;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-weight: bold;
-        font-size: 0.85em;
-        margin-right: 8px;
-      }
-      .close-btn {
-        display: block;
-        width: 150px;
-        margin: 40px auto 10px;
-        padding: 12px;
-        background-color: var(--accent-color);
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 1em;
-        font-weight: bold;
-        cursor: pointer;
-        text-align: center;
-        transition: opacity 0.2s;
-      }
-      .close-btn:hover {
-        opacity: 0.9;
-      }
-    </style>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/patch-notes.css" />
   </head>
   <body>
     <div class="container">
@@ -105,7 +15,7 @@
         🚀 Novas Funcionalidades
       </h2>
       <ul>
-        <li>
+        <li data-i18n="patch_notes.manual_add_feature">
           <span class="highlight">Geral</span>Implementada a funcionalidade de
           <strong>Adicionar Item Manualmente</strong>, permitindo a criação de
           entradas personalizadas em qualquer lista sem depender da busca pela
@@ -117,12 +27,12 @@
         🛠️ Melhorias e Qualidade de Vida
       </h2>
       <ul>
-        <li>
+        <li data-i18n="patch_notes.edit_title_author_improvement">
           <span class="highlight">Interface</span>Adicionada a capacidade de
           editar o <strong>título e autor/editora</strong> para itens de todas
           as listas no menu de edição.
         </li>
-        <li>
+        <li data-i18n="patch_notes.progress_input_improvement">
           <span class="highlight">Progresso</span>Corrigido o input de
           <strong>'Lido' e 'Jogado'</strong> para Livros e Games que não estava
           funcionando corretamente na lista principal.
@@ -131,7 +41,7 @@
 
       <h2 data-i18n="patch_notes.bug_fixes_title">✔️ Correções de Bugs</h2>
       <ul>
-        <li>
+        <li data-i18n="patch_notes.leading_zero_fix">
           <span class="highlight">Interface</span>Corrigido um bug visual onde o
           <strong>'0' à esquerda</strong> não desaparecia ao focar nos campos de
           progresso.
@@ -147,11 +57,6 @@
       </button>
     </div>
 
-    <script>
-      // Simples script para fechar a janela quando o botão é clicado
-      document.getElementById("close-btn").addEventListener("click", () => {
-        window.close();
-      });
-    </script>
+    <script src="../js/patch-notes.js" type="module"></script>
   </body>
 </html>

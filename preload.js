@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   navigateToHub: () => ipcRenderer.send("navigate-to-hub"),
   logout: () => ipcRenderer.send("logout"),
   navigateToSettings: () => ipcRenderer.send("navigate-to-settings"),
+  navigateToChangelog: () => ipcRenderer.send("navigate-to-changelog"),
   navigateToMain: () => ipcRenderer.send("navigate-to-main"),
   navigateBack: () => ipcRenderer.send("navigate-back"),
   navigateToConfirmRegister: () =>
