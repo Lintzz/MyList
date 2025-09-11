@@ -70,6 +70,17 @@ export const booksService = {
   },
 
   async getDisplayDetails(localItem, lang) {
+    if (localItem.isCustom) {
+      return Promise.resolve({
+        ...localItem,
+        episodes: 1,
+        images: { jpg: { large_image_url: localItem.image_url } },
+        score: "N/A",
+        type: "Livro",
+        status: "",
+        genres: [],
+      });
+    }
     const response = await this.getDetails(localItem.mal_id);
     if (!response) {
       throw new Error("Não foi possível obter os detalhes do livro.");

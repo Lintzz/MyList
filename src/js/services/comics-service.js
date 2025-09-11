@@ -89,6 +89,20 @@ export const comicsService = {
   },
 
   async getDisplayDetails(localItem) {
+    if (localItem.isCustom) {
+      return Promise.resolve({
+        ...localItem,
+        episodes: localItem.temporadas.reduce(
+          (acc, s) => acc + (s.episodes || 0),
+          0
+        ),
+        images: { jpg: { large_image_url: localItem.image_url } },
+        score: "N/A",
+        type: "HQ (Volume)",
+        status: localItem.publisherName || "",
+        genres: [],
+      });
+    }
     const response = await window.electronAPI.getMediaDetails(
       "comics",
       localItem.mal_id

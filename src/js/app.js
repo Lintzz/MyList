@@ -245,6 +245,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const statusModalCancelBtn = document.getElementById(
       "status-modal-cancel-btn"
     );
+    const addCustomItemBtn = document.getElementById("add-custom-item-btn");
+    const customItemModalOverlay = document.getElementById(
+      "custom-item-modal-overlay"
+    );
+    const customItemFormContainer = document.getElementById(
+      "custom-item-form-container"
+    );
+    const customItemSaveBtn = document.getElementById("custom-item-save-btn");
+    const customItemCancelBtn = document.getElementById(
+      "custom-item-cancel-btn"
+    );
+    const addCustomSeasonBtn = document.getElementById("add-custom-season-btn");
 
     const titleKey = `app.title_${currentMediaType}`;
     const pageTitle = t(titleKey);
@@ -767,25 +779,68 @@ document.addEventListener("DOMContentLoaded", async () => {
     function abrirModalEdicao(itemId) {
       itemEmEdicao = listaCompleta.find((a) => a.id === itemId);
       if (!itemEmEdicao) return;
-      editAnimeTitle.textContent = itemEmEdicao.title;
+
+      document.getElementById("edit-title-input").value = itemEmEdicao.title;
+      const authorGroup = document.getElementById("edit-author-group");
+      const authorInput = document.getElementById("edit-author-input");
+      const seasonsSubtitle = document.getElementById("edit-seasons-subtitle");
+      const seasonsList = document.getElementById("edit-season-list");
+      const leftActions = document.querySelector(".modal-actions-left");
+      const addCustomSeasonBtn = document.getElementById(
+        "add-custom-season-btn"
+      );
+
+      if (itemEmEdicao.isCustom) {
+        checkNewSeasonsBtn.classList.add("hidden");
+        addCustomSeasonBtn.classList.remove("hidden");
+      } else {
+        checkNewSeasonsBtn.classList.remove("hidden");
+        addCustomSeasonBtn.classList.add("hidden");
+      }
 
       if (
         currentMediaType === "books" ||
-        (currentMediaType === "movies" && itemEmEdicao.itemType === "movie") ||
-        currentMediaType === "games"
+        currentMediaType === "games" ||
+        currentMediaType === "comics"
       ) {
-        checkNewSeasonsBtn.style.display = "none";
+        authorGroup.style.display = "block";
+        if (currentMediaType === "comics") {
+          authorInput.value = itemEmEdicao.publisherName || "";
+        } else {
+          authorInput.value = (itemEmEdicao.authors || []).join(", ");
+        }
       } else {
-        checkNewSeasonsBtn.style.display = "inline-block";
+        authorGroup.style.display = "none";
       }
 
-      sortable = renderizarListaEdicao(
-        itemEmEdicao,
-        editSeasonList,
-        sortable,
-        currentMediaType,
-        t
-      );
+      if (currentMediaType === "books" || currentMediaType === "games") {
+        seasonsSubtitle.style.display = "none";
+        seasonsList.style.display = "none";
+        leftActions.style.display = "none";
+      } else {
+        seasonsSubtitle.style.display = "block";
+        seasonsList.style.display = "block";
+        leftActions.style.display = "flex";
+
+        if (
+          currentMediaType === "movies" &&
+          itemEmEdicao.itemType === "movie"
+        ) {
+          checkNewSeasonsBtn.style.display = "none";
+        } else {
+          checkNewSeasonsBtn.style.display = "inline-block";
+        }
+
+        sortable = renderizarListaEdicao(
+          itemEmEdicao,
+          editSeasonList,
+          sortable,
+          currentMediaType,
+          t,
+          itemEmEdicao.isCustom
+        );
+      }
+
       editModalOverlay.classList.remove("hidden");
       setTimeout(() => editModalOverlay.classList.add("visible"), 10);
     }
@@ -803,35 +858,56 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function salvarEdicao() {
-      const originalTemporadas = JSON.parse(
-        JSON.stringify(itemEmEdicao.temporadas)
-      );
-      editModalSaveBtn.disabled = true;
-      editModalSaveBtn.innerHTML =
-        '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+      if (!itemEmEdicao) return;
 
-      const seasonItems = editSeasonList.querySelectorAll(".edit-season-item");
-      const novasTemporadas = [];
-      const titulosNaNovaOrdem = Array.from(seasonItems).map(
-        (item) => item.dataset.originalTitle
-      );
+      const newTitle = document.getElementById("edit-title-input").value;
+      itemEmEdicao.title = newTitle;
 
-      titulosNaNovaOrdem.forEach((title) => {
-        const temporadaOriginal = originalTemporadas.find(
-          (t) => t.title === title
-        );
-        const itemDOM = Array.from(seasonItems).find(
-          (item) => item.dataset.originalTitle === title
-        );
-        if (temporadaOriginal && itemDOM) {
-          temporadaOriginal.watched_episodes = parseInt(
-            itemDOM.querySelector(".episode-input").value,
+      if (
+        currentMediaType === "books" ||
+        currentMediaType === "games" ||
+        currentMediaType === "comics"
+      ) {
+        const newAuthor = document.getElementById("edit-author-input").value;
+        if (currentMediaType === "comics") {
+          itemEmEdicao.publisherName = newAuthor;
+        } else {
+          itemEmEdicao.authors = [newAuthor];
+        }
+      }
+
+      if (currentMediaType !== "books" && currentMediaType !== "games") {
+        const novasTemporadas = [];
+        const seasonItems =
+          editSeasonList.querySelectorAll(".edit-season-item");
+
+        seasonItems.forEach((item) => {
+          const titleInput = item.querySelector(".edit-season-title-input");
+          const title = titleInput
+            ? titleInput.value
+            : item.querySelector("strong").title;
+          const watched = parseInt(
+            item.querySelector(".episode-input").value,
             10
           );
-          novasTemporadas.push(temporadaOriginal);
-        }
-      });
-      itemEmEdicao.temporadas = novasTemporadas;
+
+          let total;
+          const totalInput = item.querySelector(".episode-input-total");
+          if (totalInput) {
+            total = parseInt(totalInput.value, 10) || 0;
+          } else {
+            const totalText = item.querySelector(".episode-total").textContent;
+            total = parseInt(totalText.replace("/ ", ""), 10) || 0;
+          }
+
+          novasTemporadas.push({
+            title: title.trim(),
+            watched_episodes: watched || 0,
+            episodes: total,
+          });
+        });
+        itemEmEdicao.temporadas = novasTemporadas;
+      }
 
       const success = await salvarLista(
         db,
@@ -842,11 +918,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (success) {
         filtrarESortearERenderizarLista();
         fecharModalEdicao();
-      } else {
-        itemEmEdicao.temporadas = originalTemporadas;
       }
-      editModalSaveBtn.disabled = false;
-      editModalSaveBtn.innerHTML = t("app.edit_modal_save_button");
     }
 
     async function verificarNovasTemporadas() {
@@ -1197,7 +1269,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     });
 
-    // NOVO EVENT LISTENER
     markAllWatchedEditBtn.addEventListener("click", () => {
       const seasonItems = editSeasonList.querySelectorAll(".edit-season-item");
       seasonItems.forEach((item) => {
@@ -1207,6 +1278,23 @@ document.addEventListener("DOMContentLoaded", async () => {
           input.value = maxVal;
         }
       });
+    });
+
+    addCustomSeasonBtn.addEventListener("click", () => {
+      const newSeason = {
+        title: `Nova Parte ${itemEmEdicao.temporadas.length + 1}`,
+        episodes: 0,
+        watched_episodes: 0,
+      };
+      itemEmEdicao.temporadas.push(newSeason);
+      sortable = renderizarListaEdicao(
+        itemEmEdicao,
+        editSeasonList,
+        sortable,
+        currentMediaType,
+        t,
+        itemEmEdicao.isCustom
+      );
     });
 
     listSwitcherDropdown.addEventListener("click", (event) => {
@@ -1397,9 +1485,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           ".episode-input, .episode-input-add, .episode-input-edit"
         )
       ) {
-        if (target.value === "") {
-          target.value = 0;
-        }
         if (target.value.length > 4) {
           target.value = target.value.slice(0, 4);
         }
@@ -1414,9 +1499,43 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     };
 
+    const handleFocus = (event) => {
+      const target = event.target;
+      if (
+        target.matches(
+          ".episode-input, .episode-input-add, .episode-input-edit"
+        )
+      ) {
+        if (target.value === "0") {
+          target.value = "";
+        }
+      }
+    };
+
+    const handleBlur = (event) => {
+      const target = event.target;
+      if (
+        target.matches(
+          ".episode-input, .episode-input-add, .episode-input-edit"
+        )
+      ) {
+        if (target.value === "") {
+          target.value = "0";
+        }
+      }
+    };
+
     minhaListaContainer.addEventListener("input", handleInputValidation);
     seasonSelectionList.addEventListener("input", handleInputValidation);
     editSeasonList.addEventListener("input", handleInputValidation);
+
+    minhaListaContainer.addEventListener("focus", handleFocus, true);
+    seasonSelectionList.addEventListener("focus", handleFocus, true);
+    editSeasonList.addEventListener("focus", handleFocus, true);
+
+    minhaListaContainer.addEventListener("blur", handleBlur, true);
+    seasonSelectionList.addEventListener("blur", handleBlur, true);
+    editSeasonList.addEventListener("blur", handleBlur, true);
 
     minhaListaContainer.addEventListener("change", (event) => {
       const target = event.target;
@@ -1509,6 +1628,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           fecharModalStatus();
         } else if (!modalOverlay.classList.contains("hidden")) {
           hideModal();
+        } else if (customItemModalOverlay.classList.contains("visible")) {
+          fecharModalItemPersonalizado();
         }
       }
     });
@@ -1524,6 +1645,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           editModalSaveBtn.click();
         } else if (modalOverlay.classList.contains("visible")) {
           modalBtnConfirm.click();
+        } else if (customItemModalOverlay.classList.contains("visible")) {
+          customItemSaveBtn.click();
         }
       }
     });
@@ -1539,6 +1662,177 @@ document.addEventListener("DOMContentLoaded", async () => {
         t("app.update_now_button")
       );
     });
+
+    addCustomItemBtn.addEventListener("click", abrirModalItemPersonalizado);
+    customItemCancelBtn.addEventListener("click", fecharModalItemPersonalizado);
+    customItemSaveBtn.addEventListener("click", salvarItemPersonalizado);
+
+    function abrirModalItemPersonalizado() {
+      gerarFormularioItemPersonalizado();
+      customItemModalOverlay.classList.remove("hidden");
+      setTimeout(() => customItemModalOverlay.classList.add("visible"), 10);
+    }
+
+    function fecharModalItemPersonalizado() {
+      customItemModalOverlay.classList.remove("visible");
+      setTimeout(() => customItemModalOverlay.classList.add("hidden"), 200);
+    }
+
+    function gerarFormularioItemPersonalizado() {
+      let formHtml = `
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" id="custom-title" required>
+            </div>
+            <div class="form-group">
+                <label>URL da Imagem (Capa)</label>
+                <input type="text" id="custom-image-url">
+            </div>
+            <div class="form-group">
+                <label>Sinopse</label>
+                <textarea id="custom-synopsis" rows="3"></textarea>
+            </div>
+        `;
+
+      if (
+        currentMediaType === "books" ||
+        currentMediaType === "games" ||
+        currentMediaType === "comics" ||
+        currentMediaType === "manga"
+      ) {
+        const label =
+          currentMediaType === "comics"
+            ? "Editora"
+            : currentMediaType === "manga"
+            ? "Autor"
+            : "Autor/Desenvolvedor";
+        formHtml += `
+                <div class="form-group">
+                    <label>${label}</label>
+                    <input type="text" id="custom-author">
+                </div>
+            `;
+      }
+
+      if (
+        ["anime", "series", "movies", "comics", "manga"].includes(
+          currentMediaType
+        )
+      ) {
+        formHtml += `
+                <div id="custom-item-seasons-container">
+                    <h4>Temporadas/Partes</h4>
+                    <div id="custom-seasons-list">
+                        <div class="custom-season-item">
+                            <input type="text" placeholder="Nome da Temporada/Parte 1" class="custom-season-title">
+                            <input type="number" placeholder="Eps" class="custom-season-eps" min="0">
+                        </div>
+                    </div>
+                    <button type="button" id="add-season-btn">Adicionar Temporada</button>
+                </div>
+            `;
+      }
+
+      customItemFormContainer.innerHTML = formHtml;
+
+      if (document.getElementById("add-season-btn")) {
+        document
+          .getElementById("add-season-btn")
+          .addEventListener("click", () => {
+            const seasonsList = document.getElementById("custom-seasons-list");
+            const seasonCount = seasonsList.children.length + 1;
+            const newSeasonItem = document.createElement("div");
+            newSeasonItem.className = "custom-season-item";
+            newSeasonItem.innerHTML = `
+                    <input type="text" placeholder="Nome da Temporada/Parte ${seasonCount}" class="custom-season-title">
+                    <input type="number" placeholder="Eps" class="custom-season-eps" min="0">
+                `;
+            seasonsList.appendChild(newSeasonItem);
+          });
+      }
+    }
+
+    async function salvarItemPersonalizado() {
+      const title = document.getElementById("custom-title").value.trim();
+      if (!title) {
+        showErrorModal("Erro", "O título é obrigatório.");
+        return;
+      }
+
+      const imageUrl = document.getElementById("custom-image-url").value.trim();
+      const synopsis = document.getElementById("custom-synopsis").value.trim();
+      const authorInput = document.getElementById("custom-author");
+      const authors =
+        (currentMediaType === "books" ||
+          currentMediaType === "games" ||
+          currentMediaType === "manga") &&
+        authorInput
+          ? [authorInput.value.trim()]
+          : [];
+      const publisherName =
+        currentMediaType === "comics" && authorInput
+          ? authorInput.value.trim()
+          : null;
+
+      let temporadas = [];
+      if (
+        ["anime", "series", "movies", "comics", "manga"].includes(
+          currentMediaType
+        )
+      ) {
+        const seasonItems = document.querySelectorAll(".custom-season-item");
+        temporadas = Array.from(seasonItems).map((item, index) => ({
+          title:
+            item.querySelector(".custom-season-title").value.trim() ||
+            `Parte ${index + 1}`,
+          episodes:
+            parseInt(item.querySelector(".custom-season-eps").value, 10) || 0,
+          watched_episodes: 0,
+        }));
+      } else {
+        temporadas = [{ title: title, episodes: 1, watched_episodes: 0 }];
+      }
+
+      if (
+        temporadas.length === 0 &&
+        ["anime", "series", "movies", "comics", "manga"].includes(
+          currentMediaType
+        )
+      ) {
+        temporadas.push({ title: title, episodes: 0, watched_episodes: 0 });
+      }
+
+      const novoItem = {
+        id: proximoId++,
+        mal_id: `custom_${Date.now()}`,
+        title,
+        authors,
+        publisherName,
+        itemType: currentMediaType,
+        image_url: imageUrl,
+        synopsis,
+        temporadas,
+        isFavorite: false,
+        isCustom: true,
+      };
+
+      listaCompleta.unshift(novoItem);
+      const success = await salvarLista(
+        db,
+        currentUser.uid,
+        listaCompleta,
+        currentMediaType
+      );
+
+      if (success) {
+        filtrarESortearERenderizarLista();
+        fecharModalItemPersonalizado();
+        showToast(`"${novoItem.title}" foi adicionado à sua lista!`);
+      } else {
+        listaCompleta.shift();
+        proximoId--;
+      }
+    }
   } catch (error) {
     console.error("Erro no DOMContentLoaded do app.js:", error);
     showErrorModal(

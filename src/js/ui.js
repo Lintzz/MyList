@@ -1,21 +1,6 @@
 function formatNumberWithPadding(current, max) {
-  const maxStr = String(max);
-  // Se o máximo for '?', não adicione padding.
-  if (maxStr === "?") {
-    return `<span>${current}</span>`;
-  }
-
-  const maxLength = maxStr.length;
   const currentStr = String(current);
-  const paddingLength = maxLength - currentStr.length;
-
-  if (paddingLength <= 0) {
-    return `<span>${currentStr}</span>`;
-  }
-
-  const padding = "0".repeat(paddingLength);
-  // Usamos 'visibility: hidden' para que o espaço seja ocupado mas o texto não apareça.
-  return `<span class="invisible-padding" style="visibility: hidden;">${padding}</span><span>${currentStr}</span>`;
+  return `<span>${currentStr}</span>`;
 }
 
 export function getItemStatus(item, mediaType) {
@@ -75,17 +60,17 @@ export function renderizarLista(
 
   if (listaItems.length === 0) {
     const emptyListHTML = `
-      <div class="empty-list-container">
-        <button id="add-from-empty-btn" class="button-primary">
-          <i class="fas fa-plus"></i> Adicionar Item
-        </button>
-        </br>
-        </br>
-        </br>
-        </br>
-        <p>${t("app.empty_list")}</p>
-      </div>
-    `;
+        <div class="empty-list-container">
+          <button id="add-from-empty-btn" class="button-primary">
+            <i class="fas fa-plus"></i> Adicionar Item
+          </button>
+          </br>
+          </br>
+          </br>
+          </br>
+          <p>${t("app.empty_list")}</p>
+        </div>
+      `;
     containerElement.innerHTML = emptyListHTML;
     return;
   }
@@ -138,19 +123,26 @@ export function renderizarLista(
       const statusAtual = item.userStatus || "nao-comecou";
       const mediaTypeSuffix = mediaType === "books" ? "books" : "games";
       episodiosHTML = `
-            <div class="col-episodios-pai">
-                <select class="status-selector" data-item-id="${item.id}">
-                    <option value="nao-comecou" ${
-                      statusAtual === "nao-comecou" ? "selected" : ""
-                    }>${t(`app.status_not_started_${mediaTypeSuffix}`)}</option>
-                    <option value="assistindo" ${
-                      statusAtual === "assistindo" ? "selected" : ""
-                    }>${t(`app.status_in_progress_${mediaTypeSuffix}`)}</option>
-                    <option value="concluido" ${
-                      statusAtual === "concluido" ? "selected" : ""
-                    }>${t(`app.status_completed_${mediaTypeSuffix}`)}</option>
-                </select>
-            </div>`;
+              <div class="col-episodios-pai">
+                  <select class="status-selector" data-item-id="${item.id}">
+                      <option value="nao-comecou" ${
+                        statusAtual === "nao-comecou" ? "selected" : ""
+                      }>${t(
+        `app.status_not_started_${mediaTypeSuffix}`
+      )}</option>
+                      <option value="assistindo" ${
+                        statusAtual === "assistindo" ? "selected" : ""
+                      }>${t(
+        `app.status_in_progress_${mediaTypeSuffix}`
+      )}</option>
+                      <option value="finished" ${
+                        statusAtual === "finished" ||
+                        statusAtual === "concluido"
+                          ? "selected"
+                          : ""
+                      }>${t(`app.status_completed_${mediaTypeSuffix}`)}</option>
+                  </select>
+              </div>`;
     } else {
       const watchedFormatted = formatNumberWithPadding(
         episodiosAssistidos,
@@ -164,15 +156,15 @@ export function renderizarLista(
     const paiDiv = document.createElement("div");
     paiDiv.className = "item-lista-pai";
     paiDiv.innerHTML = `
-        <div class="col-drag"><i class="fas fa-grip-vertical drag-handle-pai ${dragDisabledClass}"></i></div>
-        <div class="col-toggle ${toggleArrowClass}"><i class="fas fa-chevron-right toggle-seasons-arrow"></i></div>
-        <div class="col-status"><div class="status-bar ${statusClass}"></div></div>
-        <div class="col-nome-pai">
-            <span class="coluna-nome anime-title-link" data-id="${item.id}" title="${item.title}">${item.title}</span>
-            ${subtextHtml}
-        </div>
-        ${episodiosHTML}
-        <div class="col-acoes-pai"><button class="options-btn" title="Opções"><i class="fas fa-ellipsis-v"></i></button></div>`;
+          <div class="col-drag"><i class="fas fa-grip-vertical drag-handle-pai ${dragDisabledClass}"></i></div>
+          <div class="col-toggle ${toggleArrowClass}"><i class="fas fa-chevron-right toggle-seasons-arrow"></i></div>
+          <div class="col-status"><div class="status-bar ${statusClass}"></div></div>
+          <div class="col-nome-pai">
+              <span class="coluna-nome anime-title-link" data-id="${item.id}" title="${item.title}">${item.title}</span>
+              ${subtextHtml}
+          </div>
+          ${episodiosHTML}
+          <div class="col-acoes-pai"><button class="options-btn" title="Opções"><i class="fas fa-ellipsis-v"></i></button></div>`;
 
     const seasonsWrapper = document.createElement("div");
     seasonsWrapper.className = "seasons-wrapper";
@@ -180,21 +172,21 @@ export function renderizarLista(
     if (!isBooksOrGames) {
       (item.temporadas || []).forEach((temporada, index) => {
         const maxVal = temporada.episodes || 0;
-        const maxAttr = maxVal > 0 ? `max="${maxVal}"` : "";
+        const maxAttr = maxVal > 0 ? `max="${maxVal}"` : 'maxlength="4"';
         const displayTotalFilho = temporada.episodes || "?";
         const filhoDiv = document.createElement("div");
         filhoDiv.className = "item-lista-filho";
         filhoDiv.dataset.seasonIndex = index;
         filhoDiv.innerHTML = `
-                <span class="season-title">${temporada.title}</span>
-                <div class="episode-controls">
-                    <button class="quick-edit-btn decrement-btn">-</button>
-                    <input type="number" class="episode-input" value="${
-                      temporada.watched_episodes || 0
-                    }" min="0" ${maxAttr} maxlength="4">
-                    <span class="episode-total">/ ${displayTotalFilho}</span>
-                    <button class="quick-edit-btn increment-btn">+</button>
-                </div>`;
+                  <span class="season-title">${temporada.title}</span>
+                  <div class="episode-controls">
+                      <button class="quick-edit-btn decrement-btn">-</button>
+                      <input type="number" class="episode-input" value="${
+                        temporada.watched_episodes || 0
+                      }" min="0" ${maxAttr}>
+                      <span class="episode-total">/ ${displayTotalFilho}</span>
+                      <button class="quick-edit-btn increment-btn">+</button>
+                  </div>`;
         seasonsWrapper.appendChild(filhoDiv);
       });
     }
@@ -242,15 +234,15 @@ export function renderizarSelecaoTemporadas(
     li.className = "season-selection-item";
     li.dataset.originalIndex = index;
     li.innerHTML = `
-          <i class="fas fa-grip-vertical drag-handle"></i>
-          <div class="season-info-add"><strong title="${temp.title}">${temp.title}</strong></div>
-          <div class="episode-controls">
-              <button class="quick-edit-btn decrement-btn-add">-</button>
-              <input type="number" class="episode-input-add" value="0" min="0" ${maxAttr} maxlength="4">
-              <span class="episode-total">/ ${displayTotalModal}</span>
-              <button class="quick-edit-btn increment-btn-add">+</button>
-          </div>
-          <button class="delete-season-btn-add" title="Remover"><i class="fas fa-times"></i></button>`;
+            <i class="fas fa-grip-vertical drag-handle"></i>
+            <div class="season-info-add"><strong title="${temp.title}">${temp.title}</strong></div>
+            <div class="episode-controls">
+                <button class="quick-edit-btn decrement-btn-add">-</button>
+                <input type="number" class="episode-input-add" value="0" min="0" ${maxAttr} maxlength="4">
+                <span class="episode-total">/ ${displayTotalModal}</span>
+                <button class="quick-edit-btn increment-btn-add">+</button>
+            </div>
+            <button class="delete-season-btn-add" title="Remover"><i class="fas fa-times"></i></button>`;
     list.appendChild(li);
   });
   containerElement.appendChild(list);
@@ -261,7 +253,8 @@ export function renderizarListaEdicao(
   containerElement,
   sortableInstance,
   mediaType,
-  t
+  t,
+  isCustom = false
 ) {
   if (sortableInstance) {
     sortableInstance.destroy();
@@ -290,26 +283,31 @@ export function renderizarListaEdicao(
   const list = document.createElement("ul");
   list.className = "edit-list-sortable";
   item.temporadas.forEach((temporada) => {
-    const maxVal = isSingleUnit ? 1 : temporada.episodes || 0;
-    const maxAttr = maxVal > 0 ? `max="${maxVal}"` : "";
-    const displayTotalEdicao = isSingleUnit ? 1 : temporada.episodes || "?";
+    const titleField = isCustom
+      ? `<input type="text" class="edit-season-title-input" value="${temporada.title}">`
+      : `<strong title="${temporada.title}">${temporada.title}</strong>`;
+
+    const episodesField = isCustom
+      ? `<input type="number" class="episode-input-total" value="${
+          temporada.episodes || 0
+        }" min="0">`
+      : `<span class="episode-total">/ ${temporada.episodes || "?"}</span>`;
+
     const li = document.createElement("li");
     li.className = "edit-season-item";
     li.dataset.originalTitle = temporada.title;
     li.innerHTML = `
-                <i class="fas fa-grip-vertical drag-handle"></i>
-                <div class="edit-season-info"><strong title="${
-                  temporada.title
-                }">${temporada.title}</strong></div>
-                <div class="episode-controls">
-                    <button class="quick-edit-btn decrement-btn-edit">-</button>
-                    <input type="number" class="episode-input" value="${
-                      temporada.watched_episodes || 0
-                    }" min="0" ${maxAttr} maxlength="4">
-                    <span class="episode-total">/ ${displayTotalEdicao}</span>
-                    <button class="quick-edit-btn increment-btn-edit">+</button>
-                </div>
-                <button class="delete-season-btn" title="Apagar"><i class="fas fa-times"></i></button>`;
+                    <i class="fas fa-grip-vertical drag-handle"></i>
+                    <div class="edit-season-info">${titleField}</div>
+                    <div class="episode-controls">
+                        <button class="quick-edit-btn decrement-btn-edit">-</button>
+                        <input type="number" class="episode-input" value="${
+                          temporada.watched_episodes || 0
+                        }" min="0" maxlength="4">
+                        ${episodesField}
+                        <button class="quick-edit-btn increment-btn-edit">+</button>
+                    </div>
+                    <button class="delete-season-btn" title="Apagar"><i class="fas fa-times"></i></button>`;
     list.appendChild(li);
   });
   containerElement.appendChild(list);
@@ -351,26 +349,26 @@ export function renderizarDetalhesAnime(item, t, mediaType) {
   }
 
   content.innerHTML = `
-    <img id="details-modal-img" src="${
-      item.images?.jpg?.large_image_url ||
-      "https://placehold.co/150x210/1f1f1f/ffffff?text=Capa"
-    }" alt="Poster de ${item.title}" />
-    <div id="details-modal-info">
-        <h2 id="details-modal-title">${
-          item.title || "Título não disponível"
-        }</h2>
-        ${authorHtml}
-        <div class="details-pills">
-        <span>⭐ ${item.score || "N/A"}</span>
-        <span>${item.type || "N/A"}</span>
-        <span>${item.status || "N/A"}</span>
-        <span>${item.episodes || "?"} ${unitText}</span>
-        </div>
-        <p id="details-modal-synopsis">${
-          item.synopsis || "Sinopse não disponível."
-        }</p>
-        <div class="details-pills">${genres}</div>
-    </div>`;
+      <img id="details-modal-img" src="${
+        item.images?.jpg?.large_image_url ||
+        "https://placehold.co/150x210/1f1f1f/ffffff?text=Capa"
+      }" alt="Poster de ${item.title}" />
+      <div id="details-modal-info">
+          <h2 id="details-modal-title">${
+            item.title || "Título não disponível"
+          }</h2>
+          ${authorHtml}
+          <div class="details-pills">
+          <span>⭐ ${item.score || "N/A"}</span>
+          <span>${item.type || "N/A"}</span>
+          <span>${item.status || "N/A"}</span>
+          <span>${item.episodes || "?"} ${unitText}</span>
+          </div>
+          <p id="details-modal-synopsis">${
+            item.synopsis || "Sinopse não disponível."
+          }</p>
+          <div class="details-pills">${genres}</div>
+      </div>`;
 }
 
 export function atualizarUIEpisodio(
@@ -454,14 +452,14 @@ export function renderizarResultadosBusca(resultados, containerElement, t) {
     }
 
     itemDiv.innerHTML = `
-            <img src="${
-              item.images.jpg.image_url ||
-              "https://placehold.co/50x70/1f1f1f/ffffff?text=N/A"
-            }" alt="Poster de ${item.title}">
-            <div class="search-result-item-info">
-                <strong title="${item.title}">${item.title}</strong>
-                <small>${subText}</small>
-            </div>`;
+              <img src="${
+                item.images.jpg.image_url ||
+                "https://placehold.co/50x70/1f1f1f/ffffff?text=N/A"
+              }" alt="Poster de ${item.title}">
+              <div class="search-result-item-info">
+                  <strong title="${item.title}">${item.title}</strong>
+                  <small>${subText}</small>
+              </div>`;
     containerElement.appendChild(itemDiv);
   });
 }

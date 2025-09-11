@@ -53,6 +53,20 @@ export const seriesService = {
   },
 
   async getDisplayDetails(localItem, lang) {
+    if (localItem.isCustom) {
+      return Promise.resolve({
+        ...localItem,
+        episodes: localItem.temporadas.reduce(
+          (acc, s) => acc + (s.episodes || 0),
+          0
+        ),
+        images: { jpg: { large_image_url: localItem.image_url } },
+        score: "N/A",
+        type: "Série",
+        status: "",
+        genres: [],
+      });
+    }
     return Promise.resolve({
       title: localItem.title,
       synopsis: localItem.synopsis || "Sinopse não disponível.",

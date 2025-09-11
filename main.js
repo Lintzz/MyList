@@ -501,7 +501,11 @@ ipcMain.handle("search-media", async (event, { mediaType, term }) => {
   switch (mediaType) {
     case "anime":
       url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(term)}`;
-      break;
+      const animeData = await fetchData(url);
+      if (animeData.data) {
+        animeData.data = animeData.data.filter((item) => item.type !== "Movie");
+      }
+      return animeData;
     case "manga":
       url = `https://api.jikan.moe/v4/manga?q=${encodeURIComponent(term)}`;
       break;

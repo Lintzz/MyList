@@ -136,6 +136,13 @@
               >
                 +
               </button>
+              <button
+                id="add-custom-item-btn"
+                class="botao-add"
+                title="Adicionar item manualmente"
+              >
+                <i class="fas fa-pen"></i>
+              </button>
               <div class="search-container">
                 <i class="fas fa-magnifying-glass"></i>
                 <input
@@ -365,9 +372,16 @@
         </div>
         <h2>
           <span data-i18n="app.edit_modal_title">Editar Item:</span>
-          <span id="edit-anime-title"></span>
         </h2>
-        <p data-i18n="app.edit_modal_subtitle">
+        <div class="form-group">
+          <label for="edit-title-input">Título</label>
+          <input type="text" id="edit-title-input" />
+        </div>
+        <div class="form-group" id="edit-author-group">
+          <label for="edit-author-input">Autor/Editora</label>
+          <input type="text" id="edit-author-input" />
+        </div>
+        <p data-i18n="app.edit_modal_subtitle" id="edit-seasons-subtitle">
           Reordene, apague ou adicione novas partes.
         </p>
         <div id="edit-season-list"></div>
@@ -385,6 +399,13 @@
             >
               Verificar Novas Partes
             </button>
+            <button
+              id="add-custom-season-btn"
+              data-i18n="app.edit_modal_add_part_button"
+              class="hidden"
+            >
+              Adicionar Parte
+            </button>
           </div>
           <div class="modal-actions-right">
             <button
@@ -400,6 +421,19 @@
               Salvar Alterações
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="custom-item-modal-overlay" class="hidden">
+      <div id="custom-item-modal">
+        <h2>Adicionar Item Personalizado</h2>
+        <div id="custom-item-form-container"></div>
+        <div class="modal-actions-footer">
+          <button id="custom-item-cancel-btn">Cancelar</button>
+          <button id="custom-item-save-btn" class="button-primary">
+            Salvar Item
+          </button>
         </div>
       </div>
     </div>

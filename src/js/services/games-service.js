@@ -74,6 +74,17 @@ export const gamesService = {
   },
 
   async getDisplayDetails(localItem) {
+    if (localItem.isCustom) {
+      return Promise.resolve({
+        ...localItem,
+        episodes: 1,
+        images: { jpg: { large_image_url: localItem.image_url } },
+        score: "N/A",
+        type: "Game",
+        status: "",
+        genres: [],
+      });
+    }
     if (!localItem || !localItem.mal_id) {
       throw new Error(
         "Item local inválido ou sem mal_id para buscar detalhes."

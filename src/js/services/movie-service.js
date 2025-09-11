@@ -97,6 +97,17 @@ export const movieService = {
   },
 
   async getDisplayDetails(localItem) {
+    if (localItem.isCustom) {
+      return Promise.resolve({
+        ...localItem,
+        episodes: localItem.temporadas.length,
+        images: { jpg: { large_image_url: localItem.image_url } },
+        score: "N/A",
+        type: "Filme/Coleção",
+        status: "",
+        genres: [],
+      });
+    }
     return Promise.resolve({
       title: localItem.title,
       synopsis: localItem.synopsis || "Sinopse não disponível.",

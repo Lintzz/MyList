@@ -22,6 +22,7 @@ export const animeService = {
 
     const baseTitle = animeCompleto.title_japanese || animeCompleto.title;
 
+    // A busca interna por temporadas agora também será filtrada pelo main.js
     const searchResults = await this.search(baseTitle);
 
     const animeBaseTitleNormalized = (
@@ -30,6 +31,7 @@ export const animeService = {
 
     const todasTemporadas = searchResults.filter((item) => {
       const itemTitle = (item.title_english || item.title).toLowerCase();
+      // Garante que estamos a comparar animes com títulos que começam da mesma forma
       return itemTitle.startsWith(animeBaseTitleNormalized);
     });
 
@@ -44,6 +46,20 @@ export const animeService = {
   },
 
   async getDisplayDetails(localItem, lang) {
+    if (localItem.isCustom) {
+      return Promise.resolve({
+        ...localItem,
+        episodes: localItem.temporadas.reduce(
+          (acc, s) => acc + (s.episodes || 0),
+          0
+        ),
+        images: { jpg: { large_image_url: localItem.image_url } },
+        score: "N/A",
+        type: "Anime",
+        status: "",
+        genres: [],
+      });
+    }
     try {
       const cacheKey = `synopsis_${localItem.mal_id}_${lang}`;
       const cachedSynopsis = sessionStorage.getItem(cacheKey);

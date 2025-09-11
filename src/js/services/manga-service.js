@@ -36,6 +36,20 @@ export const mangaService = {
   },
 
   async getDisplayDetails(localItem, lang) {
+    if (localItem.isCustom) {
+      return Promise.resolve({
+        ...localItem,
+        episodes: localItem.temporadas.reduce(
+          (acc, s) => acc + (s.episodes || 0),
+          0
+        ),
+        images: { jpg: { large_image_url: localItem.image_url } },
+        score: "N/A",
+        type: "Mangá",
+        status: "",
+        genres: [],
+      });
+    }
     const response = await window.electronAPI.getMediaDetails(
       "manga",
       localItem.mal_id
