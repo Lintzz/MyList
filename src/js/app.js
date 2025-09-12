@@ -163,13 +163,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       "season-selection-view"
     );
     const seasonSelectionTitle = seasonSelectionView.querySelector("h2");
-    const selectedAnimeTitle = document.getElementById("selected-anime-title");
-    const seasonSelectionSubtitlePrefix = document.getElementById(
-      "season-selection-subtitle-prefix"
-    );
-    const seasonSelectionSubtitleSuffix = document.getElementById(
-      "season-selection-subtitle-suffix"
-    );
     const seasonSelectionList = document.getElementById(
       "season-selection-list"
     );
@@ -488,11 +481,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       searchView.classList.add("hidden");
       seasonSelectionView.classList.remove("hidden");
 
-      const subtitle = t("app.add_modal_seasons_subtitle");
-      const parts = subtitle.split("<strong>{{title}}</strong>");
-      seasonSelectionSubtitlePrefix.textContent = parts[0] || "";
-      selectedAnimeTitle.textContent = itemTitle;
-      seasonSelectionSubtitleSuffix.textContent = parts[1] || "";
+      const seasonSelectionSubtitle = document.getElementById(
+        "season-selection-subtitle"
+      );
+      seasonSelectionSubtitle.innerHTML = t("app.add_modal_seasons_subtitle", {
+        title: itemTitle,
+      });
       seasonSelectionList.innerHTML =
         '<div class="spinner" style="margin: 20px auto;"></div>';
 
@@ -1028,13 +1022,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       const oldValue = temporada.watched_episodes;
 
       const valorNumerico = isNaN(novoValor) ? 0 : novoValor;
-
-      const total = isNaN(parseInt(temporada.episodes))
-        ? Infinity
-        : parseInt(temporada.episodes);
+      const total = parseInt(temporada.episodes, 10);
 
       let valorValidado = Math.max(0, valorNumerico);
-      if (total !== Infinity) {
+      if (!isNaN(total) && total > 0) {
         valorValidado = Math.min(valorValidado, total);
       }
 

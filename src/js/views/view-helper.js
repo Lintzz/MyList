@@ -46,14 +46,14 @@ export async function applyTranslations(lang) {
     }
   });
 
-  return (key, fallback = "") => {
-    const keys = key.split(".");
-    let result = translations;
-    for (const k of keys) {
-      result = result[k];
-      if (result === undefined) return fallback || key;
+  return (key, options = {}) => {
+    let text =
+      key.split(".").reduce((obj, i) => (obj ? obj[i] : null), translations) ||
+      key;
+    for (const option in options) {
+      text = text.replace(new RegExp(`{{${option}}}`, "g"), options[option]);
     }
-    return result;
+    return text;
   };
 }
 

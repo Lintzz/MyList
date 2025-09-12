@@ -14,7 +14,7 @@ export function showConfirmationModal(
   confirmText = "Confirmar"
 ) {
   modalTitle.textContent = title;
-  modalMessage.innerHTML = message;
+  modalMessage.innerHTML = message; // MODIFICADO: De textContent para innerHTML
   confirmCallback = onConfirm;
 
   modalBtnConfirm.style.display = "inline-block";
@@ -33,7 +33,7 @@ export function showConfirmationModal(
 
 export function showErrorModal(title, message) {
   modalTitle.textContent = title;
-  modalMessage.innerHTML = message;
+  modalMessage.innerHTML = message; // MODIFICADO: De textContent para innerHTML
   confirmCallback = null;
 
   modalBtnConfirm.style.display = "inline-block";
