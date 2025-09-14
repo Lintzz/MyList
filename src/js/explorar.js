@@ -66,15 +66,15 @@ window.addEventListener("message", async (event) => {
       results = [results];
     }
 
-    if (
-      type === "random-data" &&
-      results.length > 0 &&
-      (mediaType === "movies" ||
-        mediaType === "series" ||
-        mediaType === "books")
-    ) {
-      results = [results[Math.floor(Math.random() * results.length)]];
-    }
+    // if (
+    //   type === "random-data" &&
+    //   results.length > 0 &&
+    //   (mediaType === "movies" ||
+    //     mediaType === "series" ||
+    //     mediaType === "books")
+    // ) {
+    //   results = [results[Math.floor(Math.random() * results.length)]];
+    // }
 
     renderResults(results, resultsContainer, t, mediaType);
   }

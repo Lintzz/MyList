@@ -25,7 +25,7 @@ let navigationHistory = [];
 let updateWindow = null;
 
 const apiCache = new Map();
-const CACHE_DURATION = 10 * 60 * 1000;
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutos de cache
 
 const API_KEYS = {
   comicVine: process.env.COMIC_VINE_API_KEY,
@@ -41,6 +41,93 @@ const FIREBASE_CONFIG = {
   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.FIREBASE_APP_ID,
 };
+
+// --- Controle de Rate Limit da API Jikan (Versão Robusta) ---
+const JIKAN_API_HOST = "api.jikan.moe";
+const REQUEST_DELAY = 500; // Atraso de 500ms entre requisições (2 req/s)
+let jikanRequestQueue = [];
+let isJikanQueueProcessing = false;
+
+async function processJikanQueue() {
+  if (jikanRequestQueue.length === 0) {
+    isJikanQueueProcessing = false;
+    return;
+  }
+
+  isJikanQueueProcessing = true;
+  const { url, options, bypassCache, resolve, reject } =
+    jikanRequestQueue.shift();
+
+  try {
+    const result = await performFetch(url, options, bypassCache);
+    resolve(result);
+  } catch (error) {
+    reject(error);
+  }
+
+  setTimeout(() => {
+    isJikanQueueProcessing = false;
+    processJikanQueue();
+  }, REQUEST_DELAY);
+}
+
+function enqueueJikanRequest(url, options, bypassCache) {
+  return new Promise((resolve, reject) => {
+    jikanRequestQueue.push({ url, options, bypassCache, resolve, reject });
+    if (!isJikanQueueProcessing) {
+      processJikanQueue();
+    }
+  });
+}
+// --- Fim do Controle de Rate Limit ---
+
+// Função de fetch que será chamada pela fila ou diretamente
+async function performFetch(url, options = {}, bypassCache = false) {
+  const cacheKey = url;
+  if (!bypassCache) {
+    const cached = apiCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.data;
+    }
+  }
+  try {
+    const finalOptions = {
+      ...options,
+      headers: { ...options.headers, "User-Agent": "MyListDesktopApp/1.0" },
+    };
+    const response = await fetch(url, finalOptions);
+    if (!response.ok) {
+      const errorBody = await response.text();
+      log.error(
+        `HTTP error! status: ${response.status}, for url: ${url}, body: ${errorBody}`
+      );
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    if (data.error && data.error.toUpperCase() !== "OK") {
+      log.error("API Error (não OK):", data.error);
+      return { error: true, message: `Erro da API Externa: ${data.error}` };
+    }
+    if (!bypassCache) {
+      apiCache.set(cacheKey, { data, timestamp: Date.now() });
+    }
+    return data;
+  } catch (error) {
+    log.error("API Fetch Error:", url, error);
+    return {
+      error: true,
+      message: error.message || "An unknown network error occurred",
+    };
+  }
+}
+
+// Função principal que decide se a requisição vai para a fila ou direto
+function fetchData(url, options, bypassCache) {
+  if (url.includes(JIKAN_API_HOST)) {
+    return enqueueJikanRequest(url, options, bypassCache);
+  }
+  return performFetch(url, options, bypassCache);
+}
 
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
@@ -111,7 +198,7 @@ function createWindow() {
     },
   });
 
-  //mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith("http")) {
@@ -489,42 +576,6 @@ ipcMain.handle("save-share-image", async (event, dataUrl) => {
   }
   return { success: false };
 });
-async function fetchData(url, options = {}, bypassCache = false) {
-  const cacheKey = url;
-  if (!bypassCache) {
-    const cached = apiCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      return cached.data;
-    }
-  }
-  try {
-    const finalOptions = {
-      ...options,
-      headers: { ...options.headers, "User-Agent": "MyListDesktopApp/1.0" },
-    };
-    const response = await fetch(url, finalOptions);
-    if (!response.ok) {
-      const errorBody = await response.text();
-      log.error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    if (data.error && data.error.toUpperCase() !== "OK") {
-      log.error("API Error (não OK):", data.error);
-      return { error: true, message: `Erro da API Externa: ${data.error}` };
-    }
-    if (!bypassCache) {
-      apiCache.set(cacheKey, { data, timestamp: Date.now() });
-    }
-    return data;
-  } catch (error) {
-    log.error("API Fetch Error:", url, error);
-    return {
-      error: true,
-      message: error.message || "An unknown network error occurred",
-    };
-  }
-}
 ipcMain.handle("search-media", async (event, { mediaType, term }) => {
   let url;
   switch (mediaType) {
@@ -654,88 +705,112 @@ ipcMain.handle("get-trending-media", async (event, { mediaType }) => {
   }
 });
 ipcMain.handle("get-random-media", async (event, { mediaType }) => {
-  let url;
   const randomPage = Math.floor(Math.random() * 100) + 1;
+
+  // Função para embaralhar e pegar os 8 primeiros
+  const shuffleAndPick = (array, count = 8) => {
+    if (!array || !Array.isArray(array)) return [];
+    return [...array].sort(() => 0.5 - Math.random()).slice(0, count);
+  };
+
   switch (mediaType) {
     case "anime":
-      url = `https://api.jikan.moe/v4/random/anime`;
-      return fetchData(url, {}, true);
+      const animeData = [];
+      let animeAttempts = 0;
+      const maxAnimeAttempts = 20;
+
+      while (animeData.length < 8 && animeAttempts < maxAnimeAttempts) {
+        const result = await fetchData(
+          `https://api.jikan.moe/v4/random/anime`,
+          {},
+          true
+        );
+        animeAttempts++;
+        if (result && result.data) {
+          const anime = result.data;
+          if (anime.type !== "Movie" && anime.type !== "Music") {
+            animeData.push(anime);
+          }
+        }
+      }
+      return { data: animeData };
+
     case "manga":
-      url = `https://api.jikan.moe/v4/random/manga`;
-      return fetchData(url, {}, true);
-    case "movies":
-      url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEYS.tmdb}&language=pt-BR&sort_by=popularity.desc&page=${randomPage}`;
-      return fetchData(url);
-    case "series":
-      url = `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEYS.tmdb}&language=pt-BR&sort_by=popularity.desc&page=${randomPage}`;
-      return fetchData(url);
-    case "comics":
+      const mangaPromises = Array.from({ length: 8 }, () =>
+        fetchData(`https://api.jikan.moe/v4/random/manga`, {}, true)
+      );
       try {
+        const results = await Promise.all(mangaPromises);
+        return { data: results.map((res) => res.data).filter(Boolean) };
+      } catch (error) {
+        return { error: true, message: error.message };
+      }
+
+    case "movies":
+      const movieData = await fetchData(
+        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEYS.tmdb}&language=pt-BR&sort_by=popularity.desc&page=${randomPage}`
+      );
+      if (movieData && movieData.results) {
+        movieData.results = shuffleAndPick(movieData.results);
+      }
+      return movieData;
+
+    case "series":
+      const seriesData = await fetchData(
+        `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEYS.tmdb}&language=pt-BR&sort_by=popularity.desc&page=${randomPage}`
+      );
+      if (seriesData && seriesData.results) {
+        seriesData.results = shuffleAndPick(seriesData.results);
+      }
+      return seriesData;
+
+    case "comics":
+      const comicPromises = Array.from({ length: 8 }, async () => {
         const initialUrl = `https://comicvine.gamespot.com/api/volumes/?api_key=${API_KEYS.comicVine}&format=json&limit=1`;
         const initialData = await fetchData(initialUrl);
         const totalResults = initialData.number_of_total_results;
-        if (!totalResults) {
-          throw new Error("Não foi possível obter o total de Volumes de HQs.");
-        }
+        if (!totalResults) return null;
         const randomOffset = Math.floor(Math.random() * totalResults);
         const randomUrl = `https://comicvine.gamespot.com/api/volumes/?api_key=${API_KEYS.comicVine}&format=json&limit=1&offset=${randomOffset}&field_list=id,name,image,publisher,start_year`;
         const randomData = await fetchData(randomUrl);
-        if (randomData && randomData.results) {
-          return { data: randomData.results };
-        }
-        return randomData;
+        return randomData?.results?.[0];
+      });
+      try {
+        const results = await Promise.all(comicPromises);
+        return { results: results.filter(Boolean) };
       } catch (error) {
         return { error: true, message: error.message };
       }
+
     case "books":
       const randomOffsetBooks = Math.floor(Math.random() * 1000);
-      url = `https://openlibrary.org/subjects/love.json?limit=50&offset=${randomOffsetBooks}`;
-      return fetchData(url);
+      const bookData = await fetchData(
+        `https://openlibrary.org/subjects/love.json?limit=50&offset=${randomOffsetBooks}`
+      );
+      if (bookData && bookData.works) {
+        bookData.results = shuffleAndPick(bookData.works);
+        delete bookData.works; // Limpa a chave original para consistência
+      }
+      return bookData;
+
     case "games":
-      try {
+      const gamePromises = Array.from({ length: 8 }, async () => {
         const countUrl = `https://www.giantbomb.com/api/games/?api_key=${API_KEYS.giantBomb}&format=json&limit=1&field_list=id`;
         const countData = await fetchData(countUrl);
-        if (
-          (countData.error && countData.error.toUpperCase() !== "OK") ||
-          !countData.number_of_total_results
-        ) {
-          log.error(
-            "[RANDOM GAME] Falha ao obter contagem total de jogos.",
-            countData
-          );
-          throw new Error("Não foi possível obter a contagem total de jogos.");
-        }
+        if (!countData.number_of_total_results) return null;
         const totalGames = countData.number_of_total_results;
-        for (let i = 0; i < 5; i++) {
-          const randomOffset = Math.floor(Math.random() * totalGames);
-          const randomGameUrl = `https://www.giantbomb.com/api/games/?api_key=${API_KEYS.giantBomb}&format=json&limit=1&offset=${randomOffset}&field_list=guid,name,image,deck,original_release_date,platforms,genres`;
-          const randomGameData = await fetchData(randomGameUrl);
-          if (
-            (randomGameData.error &&
-              randomGameData.error.toUpperCase() !== "OK") ||
-            !randomGameData.results ||
-            randomGameData.results.length === 0
-          ) {
-            log.warn(
-              `[RANDOM GAME] Tentativa ${
-                i + 1
-              } falhou ao buscar jogo da lista. Continuando...`
-            );
-            continue;
-          }
-          const randomGame = randomGameData.results[0];
-          if (randomGame.guid && randomGame.name && randomGame.image) {
-            return { results: [randomGame] };
-          }
-        }
-        log.error(
-          "[RANDOM GAME] Não foi possível encontrar um jogo aleatório válido após 5 tentativas."
-        );
-        throw new Error("Não foi possível encontrar um jogo aleatório válido.");
+        const randomOffset = Math.floor(Math.random() * totalGames);
+        const randomGameUrl = `https://www.giantbomb.com/api/games/?api_key=${API_KEYS.giantBomb}&format=json&limit=1&offset=${randomOffset}&field_list=guid,name,image,deck,original_release_date,platforms,genres`;
+        const randomGameData = await fetchData(randomGameUrl);
+        return randomGameData?.results?.[0];
+      });
+      try {
+        const results = await Promise.all(gamePromises);
+        return { results: results.filter(Boolean) };
       } catch (error) {
-        log.error("[RANDOM GAME] Erro final no processo de busca:", error);
         return { error: true, message: error.message };
       }
+
     default:
       return {
         error: true,

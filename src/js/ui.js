@@ -87,7 +87,7 @@ export function renderizarLista(
 
     let totalEpisodios = 0,
       episodiosAssistidos = 0;
-    let hasKnownEpisodes = false; // <-- Nova flag
+    let hasKnownEpisodes = false;
 
     (item.temporadas || []).forEach((temp) => {
       episodiosAssistidos += temp.watched_episodes || 0;
@@ -99,7 +99,6 @@ export function renderizarLista(
 
     const isBooksOrGames = mediaType === "books" || mediaType === "games";
 
-    // ** LÓGICA CORRIGIDA PARA O TOTAL **
     const displayTotal = isBooksOrGames
       ? 1
       : hasKnownEpisodes
@@ -287,7 +286,6 @@ export function renderizarListaEdicao(
       ? `<input type="text" class="edit-season-title-input" value="${temporada.title}">`
       : `<strong title="${temporada.title}">${temporada.title}</strong>`;
 
-    // CORREÇÃO APLICADA AQUI
     const episodesField = isCustom
       ? `<span class="episode-total-barra">/</span><input type="number" class="episode-input-total" value="${
           temporada.episodes || 0
@@ -349,7 +347,7 @@ export function renderizarDetalhesAnime(item, t, mediaType) {
     authorHtml = `<p><strong>${t(
       "app.list_header_author",
       "Autor"
-    )}:</strong> ${item.authors.join(", ")}</p>`;
+    )}:</strong> ${item.authors.map((a) => a.name).join(", ")}</p>`;
   }
 
   content.innerHTML = `
@@ -372,7 +370,20 @@ export function renderizarDetalhesAnime(item, t, mediaType) {
             item.synopsis || "Sinopse não disponível."
           }</p>
           <div class="details-pills">${genres}</div>
+          ${
+            item.url
+              ? `<a href="${item.url}" id="mal-link" class="button-primary" style="margin-top: 10px; text-decoration: none; text-align: center; font-size: 0.9em; padding: 8px 15px; display: inline-block; width: auto;">Ver no MyAnimeList</a>`
+              : ""
+          }
       </div>`;
+
+  const malLink = content.querySelector("#mal-link");
+  if (malLink) {
+    malLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.electronAPI.openExternalLink(malLink.href);
+    });
+  }
 }
 
 export function atualizarUIEpisodio(
@@ -391,7 +402,6 @@ export function atualizarUIEpisodio(
 
   const isSpecialStatusType = mediaType === "books" || mediaType === "games";
 
-  // ** LÓGICA CORRIGIDA AQUI **
   const item = { temporadas: [{ episodes: totalGeral }] };
   let hasKnownEpisodesUpdate = false;
   if (item.temporadas) {

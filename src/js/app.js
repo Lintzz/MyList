@@ -78,7 +78,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const loadingScreen = document.getElementById("loading-screen");
   const appContent = document.getElementById("app-content");
 
-  // Mostra a tela de loading imediatamente
   loadingScreen.classList.remove("hidden");
   appContent.classList.add("hidden");
   window.electronAPI.readyToShow();
@@ -353,7 +352,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           : 1;
       filtrarESortearERenderizarLista();
 
-      // Agora que os dados foram carregados, esconde a tela de loading e mostra o conteúdo
       mostrarConteudoPrincipal();
     }
 
@@ -490,6 +488,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       seasonSelectionList.innerHTML =
         '<div class="spinner" style="margin: 20px auto;"></div>';
 
+      const externalLink = document.getElementById("season-selection-mal-link");
+      externalLink.style.display = "none";
+
       try {
         const itemCompleto = await apiService.getDetails(
           itemId,
@@ -501,6 +502,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           return;
         }
         itemParaAdicionar = itemCompleto;
+
+        if (currentMediaType === "anime") {
+          externalLink.href = `https://chiaki.site/?/tools/watch_order/id/${itemCompleto.mal_id}`;
+          externalLink.style.display = "block";
+        }
+
         renderizarSelecaoTemporadas(
           itemCompleto.temporadas,
           seasonSelectionList,
@@ -1177,7 +1184,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    // --- Event Listeners ---
     minimizeBtn.addEventListener("click", () =>
       window.electronAPI.minimizeWindow()
     );
