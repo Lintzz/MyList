@@ -1,6 +1,6 @@
 {
   "name": "MyList",
-  "version": "1.1.8",
+  "version": "1.2.1",
   "description": "Um aplicativo para organizar e acompanhar suas mídias favoritas.",
   "main": "main.js",
   "author": "Lintz",
@@ -27,12 +27,12 @@
     "appId": "com.seu-nome.minhalista",
     "productName": "MyList",
     "artifactName": "MyList-setup-${version}.${ext}",
-    "files": [
-      "main.js",
-      "preload.js",
-      "src/**/*",
-      "package.json",
-      ".env"
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Lintzz",
+        "repo": "MyList"
+      }
     ],
     "win": {
       "target": "nsis",
@@ -40,12 +40,15 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "differentialPackage": false
     },
-    "publish": {
-      "provider": "github",
-      "owner": "Lintzz",
-      "repo": "MyList"
-    }
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "package.json",
+      ".env"
+    ]
   }
 }

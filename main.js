@@ -242,13 +242,13 @@ function createUpdateWindow() {
     x: Math.round(parentBounds.x + parentBounds.width / 2 - modalWidth / 2),
     y: Math.round(parentBounds.y + parentBounds.height - modalHeight - 20),
     parent: mainWindow,
-    modal: false,
+    modal: true, // MODIFICADO
     frame: false,
     transparent: true,
     show: false,
     resizable: false,
     movable: false,
-    alwaysOnTop: true,
+    alwaysOnTop: false, // MODIFICADO
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -299,6 +299,15 @@ function createUpdateWindow() {
 
 app.whenReady().then(() => {
   createWindow();
+
+  // // ADICIONADO: Timeout para testar o modal de atualização em desenvolvimento
+  // // Remova ou comente esta seção antes de fazer o build de produção
+  // if (process.env.NODE_ENV !== "production") {
+  //   setTimeout(() => {
+  //     log.info("Disparando modal de atualização para teste...");
+  //     createUpdateWindow();
+  //   }, 5000); // 5 segundos
+  // }
 
   const userDataPath = app.getPath("userData");
   const lastVersionPath = path.join(userDataPath, "last-version.txt");
