@@ -8,20 +8,28 @@ export async function carregarDadosUsuario(db, userId, mediaType) {
     return { userData: null, mediaList: [] };
   }
 
-  const userDocRef = db.collection("users").doc(userId); // Sintaxe v8
+  const userDocRef = db.collection("users").doc(userId);
   try {
-    const docSnap = await userDocRef.get(); // Sintaxe v8
+    const docSnap = await userDocRef.get();
     if (docSnap.exists) {
       const data = docSnap.data();
+      // CORREÇÃO: Adicionado 'hasCompletedTutorial' ao objeto retornado
       const userData = {
         displayName: data.displayName || "Utilizador",
         photoURL:
           data.photoURL || "https://placehold.co/40x40/1f1f1f/ffffff?text=U",
+        hasCompletedTutorial: data.hasCompletedTutorial || false,
       };
       const mediaList = data.lists?.[mediaType] || [];
       return { userData, mediaList };
     } else {
-      return { userData: { displayName: "Utilizador" }, mediaList: [] };
+      return {
+        userData: {
+          displayName: "Utilizador",
+          hasCompletedTutorial: false,
+        },
+        mediaList: [],
+      };
     }
   } catch (error) {
     console.error("Erro ao carregar dados do Firestore:", error);
@@ -42,7 +50,7 @@ export async function salvarLista(db, userId, mediaList, mediaType) {
     return false;
   }
 
-  const userDocRef = db.collection("users").doc(userId); // Sintaxe v8
+  const userDocRef = db.collection("users").doc(userId);
   try {
     await userDocRef.set(
       {

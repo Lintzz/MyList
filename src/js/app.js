@@ -17,6 +17,7 @@ import { booksService } from "./services/books-service.js";
 import { comicsService } from "./services/comics-service.js";
 import { gamesService } from "./services/games-service.js";
 import { applyTranslations } from "./views/view-helper.js";
+import { initListTour } from "./tutorial.js";
 
 let auth, db, t;
 let notificationListener = null;
@@ -385,6 +386,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
       if (userData) {
         atualizarPerfilUsuario(userData);
+        if (
+          !userData.hasCompletedTutorial &&
+          sessionStorage.getItem("startListTour") === "true"
+        ) {
+          initListTour(db, currentUser.uid, t);
+          sessionStorage.removeItem("startListTour");
+        }
       }
       listaCompleta = mediaList || [];
       proximoId =

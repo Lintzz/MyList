@@ -198,7 +198,7 @@ function createWindow() {
     },
   });
 
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith("http")) {

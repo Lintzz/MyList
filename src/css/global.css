@@ -8,6 +8,12 @@
   --accent-color-pink: #e83e8c;
 }
 
+/* Adicionado para forçar a remoção de margens e preenchimentos padrão */
+* {
+  margin: 0;
+  padding: 0;
+}
+
 :root,
 [data-theme="theme-dark"] {
   --bg-color: #121212;

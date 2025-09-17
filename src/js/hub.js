@@ -1,6 +1,7 @@
 import { carregarDadosUsuario } from "./firebase-service.js";
 import { atualizarPerfilUsuario } from "./ui.js";
 import { applyTranslations } from "./views/view-helper.js";
+import { initHubTour } from "./tutorial.js";
 
 let notificationListener = null;
 
@@ -68,6 +69,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
       if (userData) {
         atualizarPerfilUsuario(userData);
+        if (!userData.hasCompletedTutorial) {
+          initHubTour(db, currentUser.uid, t);
+        }
       }
       renderHubLists(settings, t);
 
