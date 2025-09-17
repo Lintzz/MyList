@@ -71,6 +71,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   sendNotificationUpdate: (count) =>
     ipcRenderer.send("notification-update", count),
 
+  // NOVA FUNÇÃO PARA PATCH NOTES
+  checkForPatchNotes: (hasCompletedTutorial) =>
+    ipcRenderer.send("check-for-patch-notes", hasCompletedTutorial),
+
   // Links Externos e Deep Link
   openExternalLink: (url) => ipcRenderer.send("open-external-link", url),
   handleDeepLink: (callback) =>

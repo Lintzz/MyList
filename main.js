@@ -299,27 +299,7 @@ function createUpdateWindow() {
 
 app.whenReady().then(() => {
   createWindow();
-
-  const userDataPath = app.getPath("userData");
-  const lastVersionPath = path.join(userDataPath, "last-version.txt");
-
-  mainWindow.once("ready-to-show", () => {
-    try {
-      const currentVersion = app.getVersion();
-      if (fs.existsSync(lastVersionPath)) {
-        const lastVersion = fs.readFileSync(lastVersionPath, "utf8");
-        if (currentVersion !== lastVersion) {
-          createPatchNotesWindow();
-          fs.writeFileSync(lastVersionPath, currentVersion, "utf8");
-        }
-      } else {
-        createPatchNotesWindow();
-        fs.writeFileSync(lastVersionPath, currentVersion, "utf8");
-      }
-    } catch (err) {
-      log.error("Failed to handle version check for patch notes:", err);
-    }
-  });
+  // A lógica dos Patch Notes foi movida para um handler do IPC
 });
 
 app.on("window-all-closed", () => {
@@ -340,6 +320,34 @@ app.on("activate", () => {
 autoUpdater.on("update-downloaded", () => {
   log.info("Update downloaded; creating update modal window.");
   createUpdateWindow();
+});
+
+// NOVO HANDLER PARA VERIFICAR E MOSTRAR PATCH NOTES
+ipcMain.on("check-for-patch-notes", (event, hasCompletedTutorial) => {
+  const userDataPath = app.getPath("userData");
+  const lastVersionPath = path.join(userDataPath, "last-version.txt");
+
+  try {
+    const currentVersion = app.getVersion();
+    if (fs.existsSync(lastVersionPath)) {
+      const lastVersion = fs.readFileSync(lastVersionPath, "utf8");
+      // Só mostra os patch notes se a versão for nova E o usuário não for novo (já completou o tutorial)
+      if (currentVersion !== lastVersion && hasCompletedTutorial) {
+        createPatchNotesWindow();
+      }
+      // Atualiza o arquivo de versão de qualquer maneira
+      fs.writeFileSync(lastVersionPath, currentVersion, "utf8");
+    } else {
+      // Se o arquivo não existe, é a primeira vez que o app roda.
+      // Mostra apenas se o usuário JÁ TIVER um tutorial completado (caso de reinstalação)
+      if (hasCompletedTutorial) {
+        createPatchNotesWindow();
+      }
+      fs.writeFileSync(lastVersionPath, currentVersion, "utf8");
+    }
+  } catch (err) {
+    log.error("Failed to handle version check for patch notes:", err);
+  }
 });
 
 ipcMain.on("notification-update", (event, count) => {

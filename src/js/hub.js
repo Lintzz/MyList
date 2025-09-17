@@ -69,7 +69,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
       if (userData) {
         atualizarPerfilUsuario(userData);
-        // Passa as 'settings' para a função do tutorial
+
+        // CHAMA A VERIFICAÇÃO DE PATCH NOTES AQUI
+        window.electronAPI.checkForPatchNotes(userData.hasCompletedTutorial);
+
         if (!userData.hasCompletedTutorial) {
           initHubTour(db, currentUser.uid, settings, t);
         }
