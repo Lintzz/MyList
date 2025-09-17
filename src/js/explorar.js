@@ -48,6 +48,20 @@ window.addEventListener("message", async (event) => {
     return;
   }
 
+  if (type === "tutorial-search") {
+    searchInput.value = payload.term;
+    handleSearch();
+    return;
+  }
+
+  if (type === "tutorial-close-details") {
+    closeDetailsModal();
+    if (window.parent.tour && window.parent.tour.isActive()) {
+      window.parent.tour.next();
+    }
+    return;
+  }
+
   if (type === "search-data" || type === "random-data") {
     hideLoading();
     if (payload.error && payload.error !== "OK") {
@@ -66,17 +80,8 @@ window.addEventListener("message", async (event) => {
       results = [results];
     }
 
-    // if (
-    //   type === "random-data" &&
-    //   results.length > 0 &&
-    //   (mediaType === "movies" ||
-    //     mediaType === "series" ||
-    //     mediaType === "books")
-    // ) {
-    //   results = [results[Math.floor(Math.random() * results.length)]];
-    // }
-
     renderResults(results, resultsContainer, t, mediaType);
+    window.parent.postMessage({ type: "tutorial-results-rendered" }, "*");
   }
 
   if (type === "details-data") {
@@ -162,33 +167,83 @@ resultsContainer.addEventListener("click", (event) => {
   const detailsLink = event.target.closest(".anime-card-image-link");
 
   if (addButton) {
-    const { id, title, type, authors } = addButton.dataset;
+    // CORREÇÃO: Impede a ação do botão "Adicionar" durante o passo de "ver detalhes"
+    if (
+      window.parent.tour &&
+      window.parent.tour.isActive() &&
+      window.parent.tour.getCurrentStep().id === "list-step4"
+    ) {
+      return; // Interrompe a execução se o clique for no botão durante este passo
+    }
 
-    if (type === "books" || type === "games") {
-      window.parent.postMessage(
-        {
-          type: "add-item-direct",
-          malId: id,
-          title,
-          itemType: type,
-          authors: authors ? JSON.parse(authors) : [],
-        },
-        "*"
-      );
-    } else {
-      window.parent.postMessage(
-        {
-          type: "open-add-anime-flow",
-          malId: id,
-          title,
-          itemType: type,
-          authors: authors ? JSON.parse(authors) : [],
-        },
-        "*"
-      );
+    const { id, title, type, authors } = addButton.dataset;
+    const isTutorialActive =
+      window.parent.tour && window.parent.tour.isActive();
+
+    // Lógica para quando o tutorial está no passo de ADICIONAR
+    if (
+      isTutorialActive &&
+      window.parent.tour.getCurrentStep().id === "list-step4_7"
+    ) {
+      if (mediaType === "books" || mediaType === "games") {
+        window.parent.postMessage(
+          {
+            type: "add-item-direct",
+            malId: id,
+            title,
+            itemType: type,
+            authors: authors ? JSON.parse(authors) : [],
+          },
+          "*"
+        );
+      } else {
+        window.parent.postMessage(
+          {
+            type: "open-add-anime-flow",
+            malId: id,
+            title,
+            itemType: type,
+            authors: authors ? JSON.parse(authors) : [],
+          },
+          "*"
+        );
+      }
+    }
+    // Lógica para quando o tutorial NÃO está ativo
+    else if (!isTutorialActive) {
+      if (mediaType === "books" || mediaType === "games") {
+        window.parent.postMessage(
+          {
+            type: "add-item-direct",
+            malId: id,
+            title,
+            itemType: type,
+            authors: authors ? JSON.parse(authors) : [],
+          },
+          "*"
+        );
+      } else {
+        window.parent.postMessage(
+          {
+            type: "open-add-anime-flow",
+            malId: id,
+            title,
+            itemType: type,
+            authors: authors ? JSON.parse(authors) : [],
+          },
+          "*"
+        );
+      }
     }
   } else if (detailsLink) {
     const { id, type } = detailsLink.dataset;
     openDetailsModal(id, type);
+    if (
+      window.parent.tour &&
+      window.parent.tour.isActive() &&
+      window.parent.tour.getCurrentStep().id === "list-step4"
+    ) {
+      window.parent.tour.next();
+    }
   }
 });

@@ -131,6 +131,7 @@ body {
   padding: 20px;
   margin-bottom: 25px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  margin-top: 25px;
 }
 
 .dashboard-section h2 {
@@ -215,7 +216,7 @@ body {
   font-size: 0.9em;
   font-weight: 500;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  /* -webkit-line-clamp: 2; */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;

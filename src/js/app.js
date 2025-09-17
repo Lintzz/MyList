@@ -349,9 +349,25 @@ document.addEventListener("DOMContentLoaded", async () => {
           case "open-add-anime-flow":
             abrirModalBusca();
             exibirTelaSelecaoTemporadas(malId, title, itemType);
+            if (window.tour && window.tour.isActive()) {
+              window.tour.next();
+            }
             break;
           case "add-item-direct":
             abrirModalStatus(malId, title, itemType);
+            // CORREÇÃO: Avança o tutorial quando o modal de status abre
+            if (window.tour && window.tour.isActive()) {
+              window.tour.next();
+            }
+            break;
+          case "tutorial-results-rendered":
+            if (
+              window.tour &&
+              window.tour.isActive() &&
+              window.tour.getCurrentStep().id === "list-step3"
+            ) {
+              window.tour.next();
+            }
             break;
         }
       } catch (error) {
@@ -391,6 +407,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           sessionStorage.getItem("startListTour") === "true"
         ) {
           initListTour(db, currentUser.uid, t);
+          if (window.startListTour) {
+            window.startListTour();
+          }
           sessionStorage.removeItem("startListTour");
         }
       }
@@ -696,8 +715,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
 
       if (success) {
+        mudarAba("lista");
         filtrarESortearERenderizarLista();
         showToast(`"${novoItem.title}" foi adicionado à sua lista!`);
+        if (window.tour && window.tour.isActive()) {
+          setTimeout(() => {
+            if (window.tour) window.tour.show("list-step6");
+          }, 500);
+        }
       } else {
         listaCompleta.shift();
         proximoId--;
@@ -826,9 +851,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentMediaType
       );
       if (success) {
+        mudarAba("lista"); // Volta para a aba da lista
         filtrarESortearERenderizarLista();
         fecharModalBusca();
         showToast(`"${novoItem.title}" foi adicionado à sua lista!`);
+
+        if (window.tour && window.tour.isActive()) {
+          setTimeout(() => {
+            if (window.tour) window.tour.show("list-step6");
+          }, 500);
+        }
       } else {
         listaCompleta.shift();
         proximoId--;
@@ -1258,6 +1290,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function fecharDropdowns() {
+      if (window.tour && window.tour.isActive()) {
+        const currentStep = window.tour.getCurrentStep();
+        if (currentStep && currentStep.id === "list-step1_5") {
+          window.tour.next();
+        }
+      }
       if (optionsDropdown) optionsDropdown.classList.add("hidden");
       if (userProfileDropdown) userProfileDropdown.classList.add("hidden");
       if (filterDropdown) filterDropdown.classList.add("hidden");
@@ -1285,7 +1323,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const rect = triggerElement.getBoundingClientRect();
 
-      // Aplica posicionamento dinâmico apenas para menus específicos
       if (
         menu.id === "user-profile-dropdown" ||
         menu.id === "notification-dropdown"
@@ -1300,7 +1337,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         menu.style.right = `${window.innerWidth - rect.right}px`;
         menu.style.transform = "none";
       } else {
-        // Para os outros, limpa estilos inline para deixar o CSS controlar
         menu.style.top = "";
         menu.style.left = "";
         menu.style.right = "";
@@ -1324,6 +1360,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     userProfileArea.addEventListener("click", (e) => {
       e.stopPropagation();
       abrirDropdown(e.currentTarget, userProfileDropdown);
+      if (window.tour && window.tour.isActive()) {
+        window.tour.next();
+      }
     });
 
     if (notificationBell) {

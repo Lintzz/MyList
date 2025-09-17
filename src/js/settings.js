@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const listManagementContainer = document.getElementById(
       "list-management-container"
     );
+    const btnResetTutorial = document.getElementById("btn-reset-tutorial");
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -358,6 +359,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnChangelog.addEventListener("click", () => {
         window.electronAPI.navigateToChangelog();
       });
+
+      if (btnResetTutorial) {
+        btnResetTutorial.addEventListener("click", async () => {
+          if (!currentUser) return;
+          try {
+            await db.collection("users").doc(currentUser.uid).update({
+              hasCompletedTutorial: false,
+            });
+            showModal(
+              t("settings.reset_tutorial_success_title"),
+              t("settings.reset_tutorial_success_message")
+            );
+          } catch (error) {
+            console.error("Erro ao resetar o tutorial:", error);
+            showModal(
+              t("settings.reset_tutorial_error_title"),
+              t("settings.reset_tutorial_error_message")
+            );
+          }
+        });
+      }
 
       modalBtnCancel.addEventListener("click", hideModal);
 

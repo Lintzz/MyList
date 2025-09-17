@@ -69,8 +69,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
       if (userData) {
         atualizarPerfilUsuario(userData);
+        // Passa as 'settings' para a função do tutorial
         if (!userData.hasCompletedTutorial) {
-          initHubTour(db, currentUser.uid, t);
+          initHubTour(db, currentUser.uid, settings, t);
         }
       }
       renderHubLists(settings, t);
