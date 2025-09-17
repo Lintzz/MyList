@@ -1309,10 +1309,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!menu) return;
       const isVisible = !menu.classList.contains("hidden");
 
+      // Fecha todos os outros dropdowns antes de abrir um novo
       if (!isVisible) {
         fecharDropdowns();
       }
 
+      // Se o menu já estiver visível, esconde-o e sai da função
       if (isVisible) {
         menu.classList.add("hidden");
         if (triggerElement.id === "list-title-btn") {
@@ -1323,6 +1325,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const rect = triggerElement.getBoundingClientRect();
 
+      // Lógica de posicionamento
       if (
         menu.id === "user-profile-dropdown" ||
         menu.id === "notification-dropdown"
@@ -1336,12 +1339,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         menu.style.left = "auto";
         menu.style.right = `${window.innerWidth - rect.right}px`;
         menu.style.transform = "none";
-      } else {
-        menu.style.top = "";
-        menu.style.left = "";
-        menu.style.right = "";
-        menu.style.transform = "";
+      } else if (menu.id === "filter-dropdown" || menu.id === "sort-dropdown") {
+        menu.style.top = `${rect.bottom + 5}px`;
+        // Alinha o dropdown à direita do botão que o acionou
+        menu.style.right = `${window.innerWidth - rect.right}px`;
+        menu.style.left = "auto";
+        menu.style.transform = "none";
       }
+      // O dropdown do seletor de lista já é posicionado via CSS,
+      // então não precisa de lógica extra aqui, apenas evitamos o 'else' que reseta os estilos.
 
       if (triggerElement.id === "list-title-btn") {
         triggerElement.classList.add("active");
