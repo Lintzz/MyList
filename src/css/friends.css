@@ -36,8 +36,64 @@ body {
 .friends-container h1 {
   text-align: center;
   margin-top: 0;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
+
+/* --- TABS --- */
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab-link {
+  -webkit-app-region: no-drag;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--secondary-text-color);
+  font-size: 1.1em;
+  font-weight: 500;
+  transition: color 0.2s, border-bottom-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-link:hover {
+  color: var(--primary-text-color);
+}
+
+.tab-link.active {
+  color: var(--accent-color);
+  border-bottom-color: var(--accent-color);
+}
+
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+.badge {
+  background-color: var(--destructive-color);
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7em;
+  margin-left: 5px;
+  min-width: 10px;
+  text-align: center;
+}
+
+.badge.hidden {
+  display: none;
+}
+/* --- END TABS --- */
 
 .friends-section {
   background-color: var(--surface-color);
@@ -90,7 +146,6 @@ body {
   min-height: 50px; /* Garante que o spinner tenha espaço para aparecer */
 }
 
-/* NOVO: Estilo para o container do spinner */
 .loading-spinner-container {
   display: flex;
   justify-content: center;
@@ -105,15 +160,7 @@ body {
   background-color: var(--surface-highlight-color);
   padding: 10px;
   border-radius: 6px;
-}
-
-.user-card.is-friend {
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.user-card.is-friend:hover {
-  background-color: var(--surface-color);
+  position: relative;
 }
 
 .user-card img {
@@ -127,6 +174,11 @@ body {
   flex-grow: 1;
 }
 
+.user-card .user-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .user-card .user-actions button {
   background: none;
   border: 1px solid var(--border-color);
@@ -134,7 +186,11 @@ body {
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
-  margin-left: 5px;
+  font-size: 0.9em;
+}
+
+.user-card .user-actions button:hover {
+  background-color: var(--surface-color);
 }
 
 .user-card .user-actions button.add-btn,
@@ -154,4 +210,5 @@ body {
 
 .placeholder-text {
   color: var(--secondary-text-color);
+  text-align: center;
 }

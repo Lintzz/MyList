@@ -3,81 +3,109 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' app: https://www.gstatic.com https://cdn.jsdelivr.net;"
+    />
     <title data-i18n="confirm_register.title">Complete o seu Perfil</title>
     <link rel="stylesheet" href="../css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
   </head>
   <body>
+    <div id="title-bar">
+      <div id="drag-region"></div>
+      <div id="window-controls">
+        <button id="minimize-btn" data-i18n="[title]window.minimize">_</button>
+        <button id="maximize-btn" data-i18n="[title]window.maximize">☐</button>
+        <button id="close-btn" data-i18n="[title]window.close">✕</button>
+      </div>
+    </div>
+
     <div class="confirm-container">
       <div class="confirm-box">
-        <h1 data-i18n="confirm_register.main_title">Quase lá!</h1>
-        <p data-i18n="confirm_register.subtitle">
-          Personalize o seu perfil para começar.
-        </p>
+        <div class="main-profile-setup">
+          <h1 data-i18n="confirm_register.main_title">Quase lá!</h1>
+          <p data-i18n="confirm_register.subtitle">
+            Personalize o seu perfil para começar.
+          </p>
 
-        <div class="profile-picture-container">
-          <img
-            id="profile-pic-preview"
-            src="https://placehold.co/100x100/2C2C2C/E0E0E0?text=Foto"
-            alt="Pré-visualização da foto de perfil"
-          />
+          <div class="profile-picture-container">
+            <img
+              id="profile-pic-preview"
+              src="https://placehold.co/100x100/2C2C2C/E0E0E0?text=Foto"
+              alt="Pré-visualização da foto de perfil"
+            />
+          </div>
+
+          <div class="form-group">
+            <label
+              for="profile-pic-url-input"
+              data-i18n="confirm_register.image_link_label"
+              >Link da Imagem de Perfil</label
+            >
+            <input
+              type="text"
+              id="profile-pic-url-input"
+              data-i18n="[placeholder]confirm_register.image_link_placeholder"
+              placeholder="Cole o link da imagem aqui"
+            />
+          </div>
+
+          <div class="form-group">
+            <label
+              for="nickname-input"
+              data-i18n="confirm_register.nickname_label"
+              >Como gostaria de ser chamado?</label
+            >
+            <input
+              type="text"
+              id="nickname-input"
+              data-i18n="[placeholder]confirm_register.nickname_placeholder"
+              placeholder="O seu nome de utilizador"
+            />
+          </div>
+
+          <div class="form-group">
+            <label
+              for="username-input"
+              data-i18n="confirm_register.username_label"
+              >Nome de Usuário Único</label
+            >
+            <input
+              type="text"
+              id="username-input"
+              data-i18n="[placeholder]confirm_register.username_placeholder"
+              placeholder="Ex: lintz, felipe123 (sem espaços ou acentos)"
+            />
+          </div>
         </div>
 
-        <div class="form-group">
-          <label
-            for="profile-pic-url-input"
-            data-i18n="confirm_register.image_link_label"
-            >Link da Imagem de Perfil</label
+        <div class="list-setup">
+          <div class="form-group">
+            <label data-i18n="confirm_register.lists_label"
+              >Escolha e ordene suas listas:</label
+            >
+            <div id="list-selection-container"></div>
+          </div>
+          <button
+            id="save-profile-btn"
+            class="button-primary"
+            data-i18n="confirm_register.save_button"
           >
-          <input
-            type="text"
-            id="profile-pic-url-input"
-            data-i18n="[placeholder]confirm_register.image_link_placeholder"
-            placeholder="Cole o link da imagem aqui"
-          />
+            Salvar e Entrar
+          </button>
+          <div id="status-message" class="hidden"></div>
         </div>
-
-        <div class="form-group">
-          <label
-            for="nickname-input"
-            data-i18n="confirm_register.nickname_label"
-            >Como gostaria de ser chamado?</label
-          >
-          <input
-            type="text"
-            id="nickname-input"
-            data-i18n="[placeholder]confirm_register.nickname_placeholder"
-            placeholder="O seu nome de utilizador"
-          />
-        </div>
-
-        <div class="form-group">
-          <label
-            for="username-input"
-            data-i18n="confirm_register.username_label"
-            >Nome de Usuário Único</label
-          >
-          <input
-            type="text"
-            id="username-input"
-            data-i18n="[placeholder]confirm_register.username_placeholder"
-            placeholder="Ex: lintz, felipe123 (sem espaços ou acentos)"
-          />
-        </div>
-
-        <button
-          id="save-profile-btn"
-          class="button-primary"
-          data-i18n="confirm_register.save_button"
-        >
-          Salvar e Entrar
-        </button>
-        <div id="status-message" class="hidden"></div>
       </div>
     </div>
 
     <script src="../../node_modules/firebase/firebase-app-compat.js"></script>
     <script src="../../node_modules/firebase/firebase-auth-compat.js"></script>
     <script src="../../node_modules/firebase/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <script src="../js/firebase-config.js"></script>
     <script src="../js/confirm-register.js" type="module"></script>

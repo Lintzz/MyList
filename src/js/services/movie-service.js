@@ -31,6 +31,7 @@ function normalizeData(item) {
           }`
         : null,
     synopsis: item.overview,
+    genres: item.genres || [],
     temporadas: children,
   };
 }
@@ -62,17 +63,9 @@ export const movieService = {
 
   async getDetails(id, searchResults, itemType) {
     let finalItemType = itemType || "movie";
-
     const details = await window.electronAPI.getMediaDetails(finalItemType, id);
 
     if (details.error) {
-      if (finalItemType === "movie") {
-        const collectionDetails = await window.electronAPI.getMediaDetails(
-          "collection",
-          id
-        );
-        if (!collectionDetails.error) return normalizeData(collectionDetails);
-      }
       console.error(
         `Erro ao buscar detalhes de ${finalItemType}:`,
         details.message
@@ -90,6 +83,7 @@ export const movieService = {
       if (collectionDetails.error) {
         return normalizeData(details);
       }
+      collectionDetails.genres = details.genres;
       return normalizeData(collectionDetails);
     }
 
@@ -108,15 +102,67 @@ export const movieService = {
         genres: [],
       });
     }
-    return Promise.resolve({
-      title: localItem.title,
-      synopsis: localItem.synopsis || "Sinopse não disponível.",
-      images: { jpg: { large_image_url: localItem.image_url } },
-      score: "N/A",
-      type: "Filme/Coleção",
-      status: "",
-      episodes: localItem.temporadas.length,
-      genres: [],
-    });
+
+    if (localItem.genres && localItem.genres.length > 0) {
+      return Promise.resolve(localItem);
+    }
+
+    try {
+      let details;
+      // Se for uma coleção, busca os detalhes da coleção primeiro
+      if (localItem.itemType === "collection") {
+        const collectionDetails = await window.electronAPI.getMediaDetails(
+          "collection",
+          localItem.mal_id
+        );
+        if (
+          collectionDetails &&
+          collectionDetails.parts &&
+          collectionDetails.parts.length > 0
+        ) {
+          // Pega o primeiro filme da coleção para extrair os gêneros
+          const firstMovieId = collectionDetails.parts[0].id;
+          const firstMovieDetails = await window.electronAPI.getMediaDetails(
+            "movie",
+            firstMovieId
+          );
+          if (firstMovieDetails && firstMovieDetails.genres) {
+            // Atribui os gêneros do filme à coleção
+            collectionDetails.genres = firstMovieDetails.genres;
+          }
+        }
+        details = normalizeData(collectionDetails);
+      } else {
+        // Se for um filme normal, busca os detalhes normalmente
+        details = await this.getDetails(
+          localItem.mal_id,
+          null,
+          localItem.itemType
+        );
+      }
+
+      if (!details) throw new Error("Detalhes não encontrados na API.");
+
+      return {
+        ...localItem,
+        title: details.title,
+        synopsis: details.synopsis || "Sinopse não disponível.",
+        images: { jpg: { large_image_url: details.image_url } },
+        score: "N/A",
+        type: "Filme/Coleção",
+        status: "",
+        episodes: details.temporadas.length,
+        genres: details.genres || [],
+      };
+    } catch (error) {
+      console.error(
+        "Não foi possível buscar detalhes atualizados do filme, usando dados locais:",
+        error
+      );
+      return {
+        ...localItem,
+        genres: [],
+      };
+    }
   },
 };

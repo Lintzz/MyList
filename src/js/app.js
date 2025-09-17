@@ -18,7 +18,35 @@ import { comicsService } from "./services/comics-service.js";
 import { gamesService } from "./services/games-service.js";
 import { applyTranslations } from "./views/view-helper.js";
 
-let auth, db;
+let auth, db, t;
+let notificationListener = null;
+
+function listenForNotifications(db, userId, callback) {
+  if (notificationListener) {
+    notificationListener();
+  }
+
+  const query = db
+    .collection("friend_requests")
+    .where("receiverId", "==", userId)
+    .where("status", "==", "pending");
+
+  notificationListener = query.onSnapshot(async (snapshot) => {
+    const requests = [];
+    for (const doc of snapshot.docs) {
+      const request = { id: doc.id, ...doc.data() };
+      const senderDoc = await db
+        .collection("users")
+        .doc(request.senderId)
+        .get();
+      if (senderDoc.exists) {
+        request.senderData = senderDoc.data();
+        requests.push(request);
+      }
+    }
+    callback(requests);
+  });
+}
 
 window.mudarAba = mudarAba;
 
@@ -127,7 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentSettings = await window.electronAPI.loadSettings();
     activeSort = currentSettings.sortPreference || "added";
     const lang = currentSettings.language || "pt";
-    const t = await applyTranslations(lang);
+    t = await applyTranslations(lang);
 
     const minhaListaContainer = document.getElementById("minhaLista");
     const mostrarFormBtn = document.getElementById("mostrarFormBtn");
@@ -189,6 +217,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const btnDropdownFavorite = document.getElementById(
       "btn-dropdown-favorite"
     );
+    const btnDropdownSuperFavorite = document.getElementById(
+      "btn-dropdown-super-favorite"
+    );
     const btnDropdownEdit = document.getElementById("btn-dropdown-edit");
     const btnDropdownDelete = document.getElementById("btn-dropdown-delete");
     const topNav = document.querySelector(".top-nav");
@@ -204,10 +235,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const updateNotification = document.getElementById("update-notification");
     const updateNowBtn = document.getElementById("update-now-btn");
     const toastNotification = document.getElementById("toast-notification");
-
     const modalOverlay = document.getElementById("modal-overlay");
     const modalBtnConfirm = document.getElementById("modal-btn-confirm");
-
     const statusModalOverlay = document.getElementById("status-modal-overlay");
     const statusModalMessage = document.getElementById("status-modal-message");
     const statusModalOptions = document.getElementById("status-modal-options");
@@ -226,6 +255,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       "custom-item-cancel-btn"
     );
     const addCustomSeasonBtn = document.getElementById("add-custom-season-btn");
+    const notificationBell = document.getElementById("notification-bell");
+    const notificationCount = document.getElementById("notification-count");
+    const notificationDropdown = document.getElementById(
+      "notification-dropdown"
+    );
 
     const titleKey = `app.title_${currentMediaType}`;
     const pageTitle = t(titleKey);
@@ -247,6 +281,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (user) {
         currentUser = user;
         iniciarCarregamentoDeDados();
+        listenForNotifications(db, currentUser.uid, (requests) => {
+          const count = requests.length;
+          notificationBell.classList.remove("hidden");
+          notificationCount.textContent = count;
+          notificationCount.classList.toggle("hidden", count === 0);
+          renderNotificationDropdown(requests);
+        });
       } else {
         window.electronAPI.navigateToMain();
       }
@@ -350,9 +391,73 @@ document.addEventListener("DOMContentLoaded", async () => {
         listaCompleta.length > 0
           ? Math.max(...listaCompleta.map((a) => a.id || 0)) + 1
           : 1;
+
+      renderizarListSwitcher(currentSettings, t);
       filtrarESortearERenderizarLista();
 
       mostrarConteudoPrincipal();
+    }
+
+    function renderizarListSwitcher(settings, t) {
+      const listOrder = settings.listOrder || [
+        "anime",
+        "manga",
+        "movies",
+        "series",
+        "comics",
+        "books",
+        "games",
+      ];
+      const listVisibility = settings.listVisibility || {};
+
+      listSwitcherDropdown.innerHTML = "";
+      listOrder.forEach((listType) => {
+        if (listVisibility[listType]) {
+          const option = document.createElement("a");
+          option.href = "#";
+          option.className = "list-option";
+          option.dataset.listType = listType;
+          const titleKey = `app.title_${listType}`;
+          option.dataset.i18n = titleKey;
+          option.textContent = t(titleKey);
+          listSwitcherDropdown.appendChild(option);
+        }
+      });
+    }
+
+    function renderNotificationDropdown(requests) {
+      if (!notificationDropdown) return;
+      notificationDropdown.innerHTML = "";
+      if (requests.length === 0) {
+        notificationDropdown.innerHTML = `<div class="notification-item">${t(
+          "friends.no_pending_requests"
+        )}</div>`;
+        return;
+      }
+
+      requests.forEach((req) => {
+        const item = document.createElement("div");
+        item.className = "notification-item";
+        item.innerHTML = `
+            <img src="${
+              req.senderData.photoURL ||
+              "https://placehold.co/40x40/1f1f1f/ffffff?text=U"
+            }" alt="Avatar">
+            <div class="notification-info">
+              <strong>${req.senderData.displayName}</strong>
+              <span>@${req.senderData.username}</span>
+            </div>
+            <div class="notification-actions">
+              <button class="accept-btn" data-id="${req.id}">${t(
+          "friends.accept_button"
+        )}</button>
+              <button class="decline-btn" data-id="${req.id}">${t(
+          "friends.decline_button"
+        )}</button>
+            </div>
+          `;
+        notificationDropdown.appendChild(item);
+      });
     }
 
     function filtrarESortearERenderizarLista() {
@@ -561,6 +666,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         itemType: currentMediaType,
         image_url: imageUrl,
         synopsis: itemCompleto.synopsis || "",
+        genres: itemCompleto.genres || [],
         temporadas: [
           {
             title: itemCompleto.title,
@@ -569,6 +675,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           },
         ],
         isFavorite: false,
+        isSuperFavorite: false,
         userStatus: status,
       };
 
@@ -697,8 +804,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         image_url: imageUrl,
         synopsis:
           itemParaAdicionar.synopsis || itemParaAdicionar.overview || "",
+        genres: itemParaAdicionar.genres || [],
         temporadas: temporadasSelecionadas,
         isFavorite: false,
+        isSuperFavorite: false,
       };
 
       listaCompleta.unshift(novoItem);
@@ -1141,47 +1250,60 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function fecharDropdowns() {
-      optionsDropdown.classList.add("hidden");
-      userProfileDropdown.classList.add("hidden");
-      filterDropdown.classList.add("hidden");
-      sortDropdown.classList.add("hidden");
-      listSwitcherDropdown.classList.add("hidden");
-      listTitleBtn.classList.remove("active");
+      if (optionsDropdown) optionsDropdown.classList.add("hidden");
+      if (userProfileDropdown) userProfileDropdown.classList.add("hidden");
+      if (filterDropdown) filterDropdown.classList.add("hidden");
+      if (sortDropdown) sortDropdown.classList.add("hidden");
+      if (listSwitcherDropdown) listSwitcherDropdown.classList.add("hidden");
+      if (listTitleBtn) listTitleBtn.classList.remove("active");
+      if (notificationDropdown) notificationDropdown.classList.add("hidden");
     }
 
     function abrirDropdown(triggerElement, menu) {
+      if (!menu) return;
       const isVisible = !menu.classList.contains("hidden");
-      fecharDropdowns();
-      if (isVisible) return;
 
-      if (menu === listSwitcherDropdown) {
-        menu.classList.remove("hidden");
-        triggerElement.classList.add("active");
-      } else {
-        const rect = triggerElement.getBoundingClientRect();
-        menu.style.visibility = "hidden";
-        menu.classList.remove("hidden");
-        const menuHeight = menu.offsetHeight;
-        menu.classList.add("hidden");
-        menu.style.visibility = "visible";
-        if (rect.bottom + menuHeight > window.innerHeight) {
-          menu.style.top = `${rect.top - menuHeight}px`;
-        } else {
-          menu.style.top = `${rect.bottom + 5}px`;
-        }
-        if (
-          menu === optionsDropdown ||
-          menu === filterDropdown ||
-          menu === sortDropdown
-        ) {
-          menu.style.left = "auto";
-          menu.style.right = `${window.innerWidth - rect.right}px`;
-        } else {
-          menu.style.right = "auto";
-          menu.style.left = `${rect.left}px`;
-        }
-        menu.classList.remove("hidden");
+      if (!isVisible) {
+        fecharDropdowns();
       }
+
+      if (isVisible) {
+        menu.classList.add("hidden");
+        if (triggerElement.id === "list-title-btn") {
+          triggerElement.classList.remove("active");
+        }
+        return;
+      }
+
+      const rect = triggerElement.getBoundingClientRect();
+
+      // Aplica posicionamento dinâmico apenas para menus específicos
+      if (
+        menu.id === "user-profile-dropdown" ||
+        menu.id === "notification-dropdown"
+      ) {
+        menu.style.top = `${rect.bottom + 5}px`;
+        menu.style.left = `${rect.left}px`;
+        menu.style.right = "auto";
+        menu.style.transform = "none";
+      } else if (menu.id === "options-dropdown") {
+        menu.style.top = `${rect.bottom + 5}px`;
+        menu.style.left = "auto";
+        menu.style.right = `${window.innerWidth - rect.right}px`;
+        menu.style.transform = "none";
+      } else {
+        // Para os outros, limpa estilos inline para deixar o CSS controlar
+        menu.style.top = "";
+        menu.style.left = "";
+        menu.style.right = "";
+        menu.style.transform = "";
+      }
+
+      if (triggerElement.id === "list-title-btn") {
+        triggerElement.classList.add("active");
+      }
+
+      menu.classList.remove("hidden");
     }
 
     minimizeBtn.addEventListener("click", () =>
@@ -1195,6 +1317,58 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.stopPropagation();
       abrirDropdown(e.currentTarget, userProfileDropdown);
     });
+
+    if (notificationBell) {
+      notificationBell.addEventListener("click", (e) => {
+        e.stopPropagation();
+        abrirDropdown(notificationBell, notificationDropdown);
+      });
+    }
+
+    if (notificationDropdown) {
+      notificationDropdown.addEventListener("click", async (e) => {
+        const target = e.target.closest("button");
+        if (!target) return;
+
+        const requestId = target.dataset.id;
+
+        if (target.classList.contains("accept-btn")) {
+          const requestRef = db.collection("friend_requests").doc(requestId);
+          const requestDoc = await requestRef.get();
+          if (!requestDoc.exists) return;
+
+          const senderId = requestDoc.data().senderId;
+          const receiverId = currentUser.uid;
+
+          const batch = db.batch();
+          batch.delete(requestRef);
+
+          const reciprocalRequestQuery = await db
+            .collection("friend_requests")
+            .where("senderId", "==", receiverId)
+            .where("receiverId", "==", senderId)
+            .where("status", "==", "pending")
+            .get();
+
+          if (!reciprocalRequestQuery.empty) {
+            const reciprocalRequestDoc = reciprocalRequestQuery.docs[0];
+            batch.delete(reciprocalRequestDoc.ref);
+          }
+
+          batch.update(db.collection("users").doc(receiverId), {
+            friends: firebase.firestore.FieldValue.arrayUnion(senderId),
+          });
+          batch.update(db.collection("users").doc(senderId), {
+            friends: firebase.firestore.FieldValue.arrayUnion(receiverId),
+          });
+
+          await batch.commit();
+        } else if (target.classList.contains("decline-btn")) {
+          await db.collection("friend_requests").doc(requestId).delete();
+        }
+      });
+    }
+
     if (btnMyProfile) {
       btnMyProfile.addEventListener("click", () =>
         window.electronAPI.navigateToProfile()
@@ -1402,6 +1576,20 @@ document.addEventListener("DOMContentLoaded", async () => {
           } else {
             favoriteIcon.classList.remove("favorite-active");
           }
+
+          const superFavoriteText =
+            btnDropdownSuperFavorite.querySelector("span");
+          const superFavoriteIcon = btnDropdownSuperFavorite.querySelector("i");
+
+          superFavoriteText.textContent = item.isSuperFavorite
+            ? t("app.unsuper_favorite")
+            : t("app.super_favorite");
+
+          if (item.isSuperFavorite) {
+            superFavoriteIcon.classList.add("favorite-active");
+          } else {
+            superFavoriteIcon.classList.remove("favorite-active");
+          }
         }
 
         optionsDropdown.dataset.id = itemContainer.dataset.id;
@@ -1557,6 +1745,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       const item = listaCompleta.find((a) => a.id === itemId);
       if (item) {
         item.isFavorite = !item.isFavorite;
+
+        if (!item.isFavorite) {
+          item.isSuperFavorite = false;
+        }
+
+        salvarLista(db, currentUser.uid, listaCompleta, currentMediaType);
+        filtrarESortearERenderizarLista();
+      }
+      fecharDropdowns();
+    });
+
+    btnDropdownSuperFavorite.addEventListener("click", () => {
+      const itemId = parseInt(optionsDropdown.dataset.id, 10);
+      const item = listaCompleta.find((a) => a.id === itemId);
+      if (item) {
+        item.isSuperFavorite = !item.isSuperFavorite;
+
+        if (item.isSuperFavorite && !item.isFavorite) {
+          item.isFavorite = true;
+        }
+
         salvarLista(db, currentUser.uid, listaCompleta, currentMediaType);
         filtrarESortearERenderizarLista();
       }
@@ -1802,6 +2011,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         synopsis,
         temporadas,
         isFavorite: false,
+        isSuperFavorite: false,
         isCustom: true,
       };
 

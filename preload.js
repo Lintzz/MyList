@@ -42,9 +42,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   navigateToProfile: () => ipcRenderer.send("navigate-to-profile"),
   navigateToFriends: () => ipcRenderer.send("navigate-to-friends"),
   getInitialTab: () => ipcRenderer.invoke("get-initial-tab"),
-  // NOVAS FUNÇÕES
   navigateToUserProfile: (userId) =>
     ipcRenderer.send("navigate-to-user-profile", userId),
+  navigateToCompare: (friendId) =>
+    ipcRenderer.send("navigate-to-compare", friendId),
   getUserIdToView: () => ipcRenderer.invoke("get-userId-to-view"),
 
   // Funções Seguras de API
@@ -65,6 +66,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   importarJson: () => ipcRenderer.invoke("importar-json"),
   exportarJson: (dados) => ipcRenderer.invoke("exportar-json", dados),
   saveShareImage: (dataUrl) => ipcRenderer.invoke("save-share-image", dataUrl),
+
+  // Notificações
+  sendNotificationUpdate: (count) =>
+    ipcRenderer.send("notification-update", count),
 
   // Links Externos e Deep Link
   openExternalLink: (url) => ipcRenderer.send("open-external-link", url),

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title data-i18n="compare.title">Comparar com Amigo</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/profile.css" />
+    <link rel="stylesheet" href="../css/compare-friends.css" />
+  </head>
+  <body>
+    <div id="title-bar">
+      <div id="drag-region">
+        <button id="btn-back" title="Voltar" class="back-button">
+          <i class="fas fa-arrow-left"></i>
+          <span data-i18n="settings.back_button">Voltar</span>
+        </button>
+      </div>
+      <div id="window-controls">
+        <button id="minimize-btn" data-i18n="[title]window.minimize">_</button>
+        <button id="maximize-btn" data-i18n="[title]window.maximize">☐</button>
+        <button id="close-btn" data-i18n="[title]window.close">✕</button>
+      </div>
+    </div>
+
+    <div id="loading-screen">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="compare-container hidden">
+      <div id="compare-wrapper">
+        <div class="comparison-header">
+          <div class="user-profile-summary" id="current-user-summary">
+            <img
+              src="https://placehold.co/80x80"
+              alt="Avatar do Utilizador Atual"
+            />
+            <h2 id="current-user-name">Você</h2>
+          </div>
+          <div class="vs-separator">VS</div>
+          <div class="user-profile-summary" id="friend-user-summary">
+            <img src="https://placehold.co/80x80" alt="Avatar do Amigo" />
+            <h2 id="friend-user-name">Amigo</h2>
+          </div>
+        </div>
+
+        <div class="comparison-content">
+          <div class="chart-container">
+            <h3 data-i18n="compare.items_per_list">Itens por Lista</h3>
+            <div class="canvas-wrapper">
+              <canvas id="items-per-list-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-header">
+              <h3 data-i18n="compare.genre_affinity_label">
+                Afinidade de Gêneros:
+              </h3>
+              <select id="genre-media-type-selector">
+                <option value="anime" data-i18n="hub.card_anime">Animes</option>
+                <option value="manga" data-i18n="hub.card_manga">Mangás</option>
+                <option value="movies" data-i18n="hub.card_movies">
+                  Filmes
+                </option>
+                <option value="series" data-i18n="hub.card_series">
+                  Séries
+                </option>
+                <option value="comics" data-i18n="hub.card_comics">HQs</option>
+                <option value="books" data-i18n="hub.card_books">Livros</option>
+                <option value="games" data-i18n="hub.card_games">Games</option>
+              </select>
+            </div>
+            <div class="canvas-wrapper">
+              <canvas id="genre-affinity-chart"></canvas>
+            </div>
+            <p
+              id="genre-placeholder"
+              class="placeholder-text hidden"
+              data-i18n="compare.no_genre_data"
+            >
+              Sem dados de gênero para comparar nesta categoria.
+            </p>
+          </div>
+
+          <div class="common-items-container">
+            <h3 data-i18n="compare.common_favorites">Favoritos em Comum</h3>
+            <div id="common-favorites-list" class="common-list">
+              <p
+                class="placeholder-text"
+                data-i18n="compare.no_common_favorites"
+              >
+                Nenhum favorito em comum encontrado.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../node_modules/firebase/firebase-app-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-auth-compat.js"></script>
+    <script src="../../node_modules/firebase/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/compare-friends.js" type="module"></script>
+  </body>
+</html>

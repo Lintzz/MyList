@@ -16,6 +16,7 @@ function normalizeData(item) {
       ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
       : null,
     synopsis: item.overview,
+    genres: item.genres || [],
     temporadas: children,
   };
 }
@@ -67,18 +68,38 @@ export const seriesService = {
         genres: [],
       });
     }
-    return Promise.resolve({
-      title: localItem.title,
-      synopsis: localItem.synopsis || "Sinopse não disponível.",
-      images: { jpg: { large_image_url: localItem.image_url } },
-      score: "N/A",
-      type: "Série",
-      status: "",
-      episodes: localItem.temporadas.reduce(
-        (acc, s) => acc + (s.episodes || 0),
-        0
-      ),
-      genres: [],
-    });
+
+    // Se já tivermos os gêneros, não busca de novo
+    if (localItem.genres && localItem.genres.length > 0) {
+      return Promise.resolve(localItem);
+    }
+
+    try {
+      const details = await this.getDetails(localItem.mal_id);
+      if (!details) throw new Error("Detalhes não encontrados na API.");
+      return {
+        ...localItem,
+        title: details.title,
+        synopsis: details.synopsis || "Sinopse não disponível.",
+        images: { jpg: { large_image_url: details.image_url } },
+        score: "N/A",
+        type: "Série",
+        status: "",
+        episodes: details.temporadas.reduce(
+          (acc, s) => acc + (s.episodes || 0),
+          0
+        ),
+        genres: details.genres || [],
+      };
+    } catch (error) {
+      console.error(
+        "Não foi possível buscar detalhes atualizados da série, usando dados locais:",
+        error
+      );
+      return {
+        ...localItem,
+        genres: [],
+      };
+    }
   },
 };

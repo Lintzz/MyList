@@ -18,8 +18,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const usernameInput = document.getElementById("username-input");
     const saveProfileBtn = document.getElementById("save-profile-btn");
     const statusMessage = document.getElementById("status-message");
+    const listSelectionContainer = document.getElementById(
+      "list-selection-container"
+    );
     const defaultAvatar =
       "https://placehold.co/100x100/2C2C2C/E0E0E0?text=Foto";
+
+    const minimizeBtn = document.getElementById("minimize-btn");
+    const maximizeBtn = document.getElementById("maximize-btn");
+    const closeBtn = document.getElementById("close-btn");
 
     let currentUser = null;
 
@@ -29,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         profilePicPreview.src = user.photoURL || defaultAvatar;
         profilePicUrlInput.value = user.photoURL || "";
         nicknameInput.value = user.displayName || "";
+        renderListSelection();
         window.electronAPI?.readyToShow();
       } else {
         window.electronAPI?.navigateToMain();
@@ -43,6 +51,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     profilePicPreview.onerror = () => {
       profilePicPreview.src = defaultAvatar;
     };
+
+    function renderListSelection() {
+      const listOrder = [
+        "anime",
+        "manga",
+        "movies",
+        "series",
+        "comics",
+        "books",
+        "games",
+      ];
+      listOrder.forEach((listType) => {
+        const item = document.createElement("div");
+        item.className = "list-toggle";
+        item.dataset.listType = listType;
+        item.innerHTML = `
+          <div>
+            <i class="fas fa-grip-vertical drag-handle"></i>
+            <span data-i18n="hub.card_${listType}">${t(
+          `hub.card_${listType}`
+        )}</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" checked>
+            <span class="slider"></span>
+          </label>
+        `;
+        listSelectionContainer.appendChild(item);
+      });
+
+      new Sortable(listSelectionContainer, {
+        animation: 150,
+        handle: ".drag-handle",
+      });
+    }
 
     saveProfileBtn.addEventListener("click", async () => {
       if (!currentUser) return;
@@ -87,6 +130,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         const photoURL =
           profilePicUrlInput.value.trim() || currentUser.photoURL;
 
+        const listOrder = Array.from(
+          listSelectionContainer.querySelectorAll(".list-toggle")
+        ).map((item) => item.dataset.listType);
+
+        const listVisibility = {};
+        listSelectionContainer
+          .querySelectorAll(".list-toggle")
+          .forEach((item) => {
+            const listType = item.dataset.listType;
+            const isVisible = item.querySelector(
+              "input[type=checkbox]"
+            ).checked;
+            listVisibility[listType] = isVisible;
+          });
+
         const userDocRef = db.collection("users").doc(currentUser.uid);
         await userDocRef.set(
           {
@@ -94,9 +152,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             username: newUsername,
             photoURL: photoURL,
             profileComplete: true,
+            settings: {
+              ...settings,
+              listOrder,
+              listVisibility,
+            },
           },
           { merge: true }
         );
+        await window.electronAPI.saveSettings({
+          ...settings,
+          listOrder,
+          listVisibility,
+        });
 
         window.electronAPI?.navigateToHub();
       } catch (error) {
@@ -105,6 +173,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         saveProfileBtn.disabled = false;
       }
     });
+
+    minimizeBtn.addEventListener("click", () =>
+      window.electronAPI.minimizeWindow()
+    );
+    maximizeBtn.addEventListener("click", () =>
+      window.electronAPI.maximizeWindow()
+    );
+    closeBtn.addEventListener("click", () => window.electronAPI.closeWindow());
   } catch (error) {
     console.error(
       "Falha ao inicializar a aplicação na página de registo.",

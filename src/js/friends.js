@@ -1,6 +1,7 @@
 import { applyTranslations } from "./views/view-helper.js";
 
 let auth, db, currentUser, t;
+let unsubscribes = []; // Array to store unsubscribe functions
 
 // --- Funções de Lógica do Firestore ---
 async function searchUsersInDB(currentUserId, username) {
@@ -40,93 +41,109 @@ async function searchUsersInDB(currentUserId, username) {
   }
 }
 
-async function getFriendRequestsFromDB(userId) {
-  try {
-    const snapshot = await db
-      .collection("friend_requests")
-      .where("receiverId", "==", userId)
-      .where("status", "==", "pending")
-      .get();
-    if (snapshot.empty) return [];
+function listenToFriendRequests(userId, callback) {
+  const query = db
+    .collection("friend_requests")
+    .where("receiverId", "==", userId)
+    .where("status", "==", "pending");
 
-    const requests = [];
-    for (const doc of snapshot.docs) {
-      const request = { id: doc.id, ...doc.data() };
-      const senderDoc = await db
-        .collection("users")
-        .doc(request.senderId)
-        .get();
-      if (senderDoc.exists) {
-        request.senderData = senderDoc.data();
-        requests.push(request);
+  const unsubscribe = query.onSnapshot(
+    async (snapshot) => {
+      const requests = [];
+      for (const doc of snapshot.docs) {
+        const request = { id: doc.id, ...doc.data() };
+        const senderDoc = await db
+          .collection("users")
+          .doc(request.senderId)
+          .get();
+        if (senderDoc.exists) {
+          request.senderData = senderDoc.data();
+          requests.push(request);
+        }
       }
+      callback(requests);
+      // Notifica o processo principal sobre a contagem de notificações
+      if (
+        window.electronAPI &&
+        typeof window.electronAPI.sendNotificationUpdate === "function"
+      ) {
+        window.electronAPI.sendNotificationUpdate(snapshot.size);
+      }
+    },
+    (error) => {
+      console.error("Erro ao ouvir pedidos de amizade:", error);
+      callback([]);
     }
-    return requests;
-  } catch (error) {
-    console.error("Erro ao buscar pedidos de amizade:", error);
-    return [];
-  }
+  );
+  unsubscribes.push(unsubscribe);
 }
 
-async function getSentRequestsFromDB(userId) {
-  try {
-    const snapshot = await db
-      .collection("friend_requests")
-      .where("senderId", "==", userId)
-      .where("status", "==", "pending")
-      .get();
-    if (snapshot.empty) return [];
+function listenToSentRequests(userId, callback) {
+  const query = db
+    .collection("friend_requests")
+    .where("senderId", "==", userId)
+    .where("status", "==", "pending");
 
-    const requests = [];
-    for (const doc of snapshot.docs) {
-      const request = { id: doc.id, ...doc.data() };
-      const receiverDoc = await db
-        .collection("users")
-        .doc(request.receiverId)
-        .get();
-      if (receiverDoc.exists) {
-        request.receiverData = receiverDoc.data();
-        requests.push(request);
+  const unsubscribe = query.onSnapshot(
+    async (snapshot) => {
+      const requests = [];
+      for (const doc of snapshot.docs) {
+        const request = { id: doc.id, ...doc.data() };
+        const receiverDoc = await db
+          .collection("users")
+          .doc(request.receiverId)
+          .get();
+        if (receiverDoc.exists) {
+          request.receiverData = receiverDoc.data();
+          requests.push(request);
+        }
       }
+      callback(requests);
+    },
+    (error) => {
+      console.error("Erro ao ouvir pedidos enviados:", error);
+      callback([]);
     }
-    return requests;
-  } catch (error) {
-    console.error("Erro ao buscar pedidos enviados:", error);
-    return [];
-  }
+  );
+  unsubscribes.push(unsubscribe);
 }
 
-async function getFriendsFromDB(userId) {
-  try {
-    const userDoc = await db.collection("users").doc(userId).get();
-    if (
-      !userDoc.exists ||
-      !userDoc.data().friends ||
-      userDoc.data().friends.length === 0
-    ) {
-      return [];
-    }
-
-    const friendIds = userDoc.data().friends;
-    const friends = [];
-    for (const friendId of friendIds) {
-      const friendDoc = await db.collection("users").doc(friendId).get();
-      if (friendDoc.exists) {
-        friends.push(friendDoc.data());
+function listenToFriends(userId, callback) {
+  const unsubscribe = db
+    .collection("users")
+    .doc(userId)
+    .onSnapshot(
+      async (doc) => {
+        if (!doc.exists) {
+          callback([]);
+          return;
+        }
+        const friendIds = doc.data().friends || [];
+        if (friendIds.length === 0) {
+          callback([]);
+          return;
+        }
+        const friends = [];
+        for (const friendId of friendIds) {
+          const friendDoc = await db.collection("users").doc(friendId).get();
+          if (friendDoc.exists) {
+            friends.push(friendDoc.data());
+          }
+        }
+        callback(friends);
+      },
+      (error) => {
+        console.error("Erro ao ouvir lista de amigos:", error);
+        callback([]);
       }
-    }
-    return friends;
-  } catch (error) {
-    console.error("Erro ao buscar amigos:", error);
-    return [];
-  }
+    );
+  unsubscribes.push(unsubscribe);
 }
 
 // --- Funções de Renderização ---
 function renderUserCard(user, type, requestId = null) {
   const defaultAvatar = "https://placehold.co/40x40/1f1f1f/ffffff?text=U";
   let actionsHtml = "";
-  let cardClass = "user-card";
 
   switch (type) {
     case "search":
@@ -147,16 +164,21 @@ function renderUserCard(user, type, requestId = null) {
       )}</button>`;
       break;
     case "friend":
-      cardClass += " is-friend";
-      actionsHtml = `<button class="remove-btn" data-id="${user.uid}">${t(
-        "friends.remove_button"
-      )}</button>`;
+      actionsHtml = `
+        <button class="view-profile-btn" data-id="${user.uid}">${t(
+        "friends.view_profile_button"
+      )}</button>
+        <button class="compare-btn" data-id="${user.uid}">${t(
+        "friends.compare_button"
+      )}</button>
+        <button class="remove-btn" data-id="${
+          user.uid
+        }"><i class="fas fa-user-times"></i></button>
+      `;
       break;
   }
 
-  return `<div class="${cardClass}" data-friend-id="${
-    type === "friend" ? user.uid : ""
-  }">
+  return `<div class="user-card">
       <img src="${user.photoURL || defaultAvatar}" alt="Avatar de ${
     user.displayName
   }">
@@ -182,6 +204,11 @@ function renderSearchResults(users) {
 
 function renderFriendRequests(requests) {
   const container = document.getElementById("friend-requests-container");
+  const badge = document.getElementById("requests-count-badge");
+
+  badge.textContent = requests.length;
+  badge.classList.toggle("hidden", requests.length === 0);
+
   if (!requests || requests.length === 0) {
     container.innerHTML = `<p class="placeholder-text">${t(
       "friends.no_pending_requests"
@@ -229,16 +256,15 @@ async function searchUsers() {
   renderSearchResults(results);
 }
 
-async function loadFriendData() {
+function setupRealtimeListeners() {
   if (!currentUser) return;
-  const requests = await getFriendRequestsFromDB(currentUser.uid);
-  renderFriendRequests(requests);
 
-  const sentRequests = await getSentRequestsFromDB(currentUser.uid);
-  renderSentRequests(sentRequests);
+  unsubscribes.forEach((unsub) => unsub());
+  unsubscribes = [];
 
-  const friends = await getFriendsFromDB(currentUser.uid);
-  renderFriendsList(friends);
+  listenToFriendRequests(currentUser.uid, renderFriendRequests);
+  listenToSentRequests(currentUser.uid, renderSentRequests);
+  listenToFriends(currentUser.uid, renderFriendsList);
 }
 
 // --- Inicialização e Event Listeners ---
@@ -259,11 +285,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   const closeBtn = document.getElementById("close-btn");
   const searchBtn = document.getElementById("search-friends-btn");
   const searchInput = document.getElementById("search-friends-input");
+  const searchResultsContainer = document.getElementById(
+    "search-results-container"
+  );
+  const tabs = document.querySelectorAll(".tab-link");
+  const tabContents = document.querySelectorAll(".tab-content");
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      tabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+
+      const targetTab = document.getElementById(tab.dataset.tab);
+      tabContents.forEach((content) => content.classList.remove("active"));
+      if (targetTab) {
+        targetTab.classList.add("active");
+      }
+    });
+  });
 
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       currentUser = user;
-      await loadFriendData();
+      setupRealtimeListeners();
       window.electronAPI.readyToShow();
     } else {
       window.electronAPI.navigateToMain();
@@ -277,66 +321,67 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.body.addEventListener("click", async (e) => {
     if (!currentUser) return;
-    const target = e.target;
+    const actionButton = e.target.closest("button");
+    if (!actionButton) return;
 
-    const actionButton = target.closest("button");
-    if (actionButton) {
-      const targetId = actionButton.dataset.id;
-      if (actionButton.classList.contains("add-btn")) {
-        await db.collection("friend_requests").add({
-          senderId: currentUser.uid,
-          receiverId: targetId,
-          status: "pending",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        });
-        actionButton.textContent = t("friends.sent_button");
-        actionButton.disabled = true;
-        loadFriendData();
-      } else if (actionButton.classList.contains("accept-btn")) {
-        const requestRef = db.collection("friend_requests").doc(targetId);
-        const requestDoc = await requestRef.get();
-        if (!requestDoc.exists) return;
-        const senderId = requestDoc.data().senderId;
+    const targetId = actionButton.dataset.id;
 
-        const batch = db.batch();
-        batch.update(requestRef, { status: "accepted" });
-        batch.update(db.collection("users").doc(currentUser.uid), {
-          friends: firebase.firestore.FieldValue.arrayUnion(senderId),
-        });
-        batch.update(db.collection("users").doc(senderId), {
-          friends: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
-        });
-        await batch.commit();
-        loadFriendData();
-      } else if (actionButton.classList.contains("decline-btn")) {
-        await db
-          .collection("friend_requests")
-          .doc(targetId)
-          .update({ status: "rejected" });
-        loadFriendData();
-      } else if (actionButton.classList.contains("cancel-btn")) {
-        await db.collection("friend_requests").doc(targetId).delete();
-        loadFriendData();
-      } else if (actionButton.classList.contains("remove-btn")) {
-        const batch = db.batch();
-        batch.update(db.collection("users").doc(currentUser.uid), {
-          friends: firebase.firestore.FieldValue.arrayRemove(targetId),
-        });
-        batch.update(db.collection("users").doc(targetId), {
-          friends: firebase.firestore.FieldValue.arrayRemove(currentUser.uid),
-        });
-        await batch.commit();
-        loadFriendData();
+    if (actionButton.classList.contains("add-btn")) {
+      await db.collection("friend_requests").add({
+        senderId: currentUser.uid,
+        receiverId: targetId,
+        status: "pending",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      searchInput.value = "";
+      searchResultsContainer.innerHTML = "";
+    } else if (actionButton.classList.contains("accept-btn")) {
+      const requestRef = db.collection("friend_requests").doc(targetId);
+      const requestDoc = await requestRef.get();
+      if (!requestDoc.exists) return;
+
+      const senderId = requestDoc.data().senderId;
+      const receiverId = currentUser.uid;
+
+      const batch = db.batch();
+      batch.delete(requestRef);
+
+      const reciprocalRequestQuery = await db
+        .collection("friend_requests")
+        .where("senderId", "==", receiverId)
+        .where("receiverId", "==", senderId)
+        .where("status", "==", "pending")
+        .get();
+      if (!reciprocalRequestQuery.empty) {
+        const reciprocalRequestDoc = reciprocalRequestQuery.docs[0];
+        batch.delete(reciprocalRequestDoc.ref);
       }
-      return;
-    }
 
-    const friendCard = target.closest(".user-card.is-friend");
-    if (friendCard) {
-      const friendId = friendCard.dataset.friendId;
-      if (friendId) {
-        window.electronAPI.navigateToUserProfile(friendId);
-      }
+      batch.update(db.collection("users").doc(receiverId), {
+        friends: firebase.firestore.FieldValue.arrayUnion(senderId),
+      });
+      batch.update(db.collection("users").doc(senderId), {
+        friends: firebase.firestore.FieldValue.arrayUnion(receiverId),
+      });
+      await batch.commit();
+    } else if (
+      actionButton.classList.contains("decline-btn") ||
+      actionButton.classList.contains("cancel-btn")
+    ) {
+      await db.collection("friend_requests").doc(targetId).delete();
+    } else if (actionButton.classList.contains("remove-btn")) {
+      const batch = db.batch();
+      batch.update(db.collection("users").doc(currentUser.uid), {
+        friends: firebase.firestore.FieldValue.arrayRemove(targetId),
+      });
+      batch.update(db.collection("users").doc(targetId), {
+        friends: firebase.firestore.FieldValue.arrayRemove(currentUser.uid),
+      });
+      await batch.commit();
+    } else if (actionButton.classList.contains("view-profile-btn")) {
+      window.electronAPI.navigateToUserProfile(targetId);
+    } else if (actionButton.classList.contains("compare-btn")) {
+      window.electronAPI.navigateToCompare(targetId);
     }
   });
 

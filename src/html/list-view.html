@@ -23,16 +23,22 @@
 
     <div id="app-content" class="hidden">
       <div id="title-bar">
-        <div
-          id="user-profile-area"
-          class="loading-skeleton"
-          data-i18n="[title]app.user_menu_tooltip"
-        >
-          <div class="skeleton skeleton-avatar"></div>
-          <div class="skeleton skeleton-text"></div>
-          <img id="user-avatar" src="" alt="Avatar do utilizador" />
-          <span id="user-nickname">Utilizador</span>
-          <i class="fas fa-chevron-down"></i>
+        <div id="title-bar-left">
+          <div
+            id="user-profile-area"
+            class="loading-skeleton"
+            data-i18n="[title]app.user_menu_tooltip"
+          >
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-text"></div>
+            <img id="user-avatar" src="" alt="Avatar do utilizador" />
+            <span id="user-nickname">Utilizador</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div id="notification-bell">
+            <i class="fas fa-bell"></i>
+            <span id="notification-count" class="badge hidden">0</span>
+          </div>
         </div>
         <div id="drag-region"></div>
         <div id="window-controls">
@@ -75,57 +81,7 @@
               <h1 id="page-title-text">Minha Lista de Animes</h1>
               <i class="fas fa-chevron-down"></i>
             </button>
-            <div id="list-switcher-dropdown" class="hidden">
-              <a
-                href="#"
-                class="list-option"
-                data-list-type="anime"
-                data-i18n="app.title_anime"
-                >Minha Lista de Animes</a
-              >
-              <a
-                href="#"
-                class="list-option"
-                data-list-type="manga"
-                data-i18n="app.title_manga"
-                >Minha Lista de Mangás</a
-              >
-              <a
-                href="#"
-                class="list-option"
-                data-list-type="movies"
-                data-i18n="app.title_movies"
-                >Minha Lista de Filmes</a
-              >
-              <a
-                href="#"
-                class="list-option"
-                data-list-type="series"
-                data-i18n="app.title_series"
-                >Minha Lista de Séries</a
-              >
-              <a
-                href="#"
-                class="list-option"
-                data-list-type="comics"
-                data-i18n="app.title_comics"
-                >Minha Lista de HQs</a
-              >
-              <a
-                href="#"
-                class="list-option"
-                data-list-type="books"
-                data-i18n="app.title_books"
-                >Minha Lista de Livros</a
-              >
-              <a
-                href="#"
-                class="list-option"
-                data-list-type="games"
-                data-i18n="app.title_games"
-                >Minha Lista de Games</a
-              >
-            </div>
+            <div id="list-switcher-dropdown" class="hidden"></div>
           </div>
           <div id="listaContainer">
             <div id="controls-bar">
@@ -209,10 +165,16 @@
       </button>
     </div>
 
+    <div id="notification-dropdown" class="hidden"></div>
+
     <div id="options-dropdown" class="options-dropdown hidden">
       <button id="btn-dropdown-favorite">
         <i class="fas fa-star"></i>
         <span data-i18n="app.favorite">Favoritar</span>
+      </button>
+      <button id="btn-dropdown-super-favorite">
+        <i class="fas fa-crown"></i>
+        <span data-i18n="app.super_favorite">Favorito Principal</span>
       </button>
       <button id="btn-dropdown-edit">
         <i class="fas fa-pen"></i>

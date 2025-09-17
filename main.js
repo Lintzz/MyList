@@ -44,7 +44,7 @@ const FIREBASE_CONFIG = {
 
 // --- Controle de Rate Limit da API Jikan (Versão Robusta) ---
 const JIKAN_API_HOST = "api.jikan.moe";
-const REQUEST_DELAY = 500; // Atraso de 500ms entre requisições (2 req/s)
+const REQUEST_DELAY = 1100; // Atraso de 1100ms (pouco menos de 1 req/s para segurança)
 let jikanRequestQueue = [];
 let isJikanQueueProcessing = false;
 
@@ -198,7 +198,7 @@ function createWindow() {
     },
   });
 
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith("http")) {
@@ -300,15 +300,6 @@ function createUpdateWindow() {
 app.whenReady().then(() => {
   createWindow();
 
-  // // ADICIONADO: Timeout para testar o modal de atualização em desenvolvimento
-  // // Remova ou comente esta seção antes de fazer o build de produção
-  // if (process.env.NODE_ENV !== "production") {
-  //   setTimeout(() => {
-  //     log.info("Disparando modal de atualização para teste...");
-  //     createUpdateWindow();
-  //   }, 5000); // 5 segundos
-  // }
-
   const userDataPath = app.getPath("userData");
   const lastVersionPath = path.join(userDataPath, "last-version.txt");
 
@@ -349,6 +340,12 @@ app.on("activate", () => {
 autoUpdater.on("update-downloaded", () => {
   log.info("Update downloaded; creating update modal window.");
   createUpdateWindow();
+});
+
+ipcMain.on("notification-update", (event, count) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("notification-count-update", count);
+  }
 });
 
 ipcMain.on("close-update-modal", () => {
@@ -451,6 +448,14 @@ ipcMain.on("navigate-to-user-profile", (event, userId) => {
   );
 });
 
+ipcMain.on("navigate-to-compare", (event, friendId) => {
+  userIdToView = friendId;
+  navigateTo(
+    BrowserWindow.fromWebContents(event.sender),
+    "src/html/compare-friends.html"
+  );
+});
+
 ipcMain.handle("get-userId-to-view", () => userIdToView);
 
 ipcMain.on("navigate-to-friends", (event) => {
@@ -516,6 +521,24 @@ ipcMain.handle("carregar-settings", async () => {
     theme: "theme-dark",
     accentColor: "blue",
     language: systemLang,
+    listOrder: [
+      "anime",
+      "manga",
+      "movies",
+      "series",
+      "comics",
+      "books",
+      "games",
+    ],
+    listVisibility: {
+      anime: true,
+      manga: true,
+      movies: true,
+      series: true,
+      comics: true,
+      books: true,
+      games: true,
+    },
   };
   try {
     if (fs.existsSync(settingsFilePath)) {

@@ -28,51 +28,68 @@
         <button id="close-btn" data-i18n="[title]window.close">✕</button>
       </div>
     </div>
+
     <div class="friends-container">
       <h1 data-i18n="friends.title">Comunidade</h1>
 
-      <section class="friends-section">
-        <h2 data-i18n="friends.search_title">Encontrar Amigos</h2>
-        <div class="search-controls">
-          <input
-            type="text"
-            id="search-friends-input"
-            data-i18n="[placeholder]friends.search_placeholder"
-            placeholder="Digite um nome de usuário..."
-          />
-          <button id="search-friends-btn" class="button-primary">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
-        <div id="search-results-container"></div>
-      </section>
+      <div class="tabs">
+        <button class="tab-link active" data-tab="tab-friends">
+          <i class="fas fa-user-friends"></i>
+          <span data-i18n="friends.my_friends_title">Meus Amigos</span>
+        </button>
+        <button class="tab-link" data-tab="tab-add">
+          <i class="fas fa-user-plus"></i>
+          <span data-i18n="friends.add_friends_title">Adicionar Amigos</span>
+          <span id="requests-count-badge" class="badge hidden">0</span>
+        </button>
+      </div>
 
-      <section class="friends-section">
-        <h2 data-i18n="friends.requests_title">Pedidos de Amizade</h2>
-        <div id="friend-requests-container">
-          <div class="loading-spinner-container">
-            <div class="spinner"></div>
+      <div id="tab-friends" class="tab-content active">
+        <section class="friends-section">
+          <h2 data-i18n="friends.my_friends_title">Meus Amigos</h2>
+          <div id="friends-list-container">
+            <div class="loading-spinner-container">
+              <div class="spinner"></div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <section class="friends-section">
-        <h2 data-i18n="friends.sent_requests_title">Pedidos Enviados</h2>
-        <div id="sent-requests-container">
-          <div class="loading-spinner-container">
-            <div class="spinner"></div>
+      <div id="tab-add" class="tab-content">
+        <section class="friends-section">
+          <h2 data-i18n="friends.search_title">Encontrar Amigos</h2>
+          <div class="search-controls">
+            <input
+              type="text"
+              id="search-friends-input"
+              data-i18n="[placeholder]friends.search_placeholder"
+              placeholder="Digite um nome de usuário..."
+            />
+            <button id="search-friends-btn" class="button-primary">
+              <i class="fas fa-search"></i>
+            </button>
           </div>
-        </div>
-      </section>
+          <div id="search-results-container"></div>
+        </section>
 
-      <section class="friends-section">
-        <h2 data-i18n="friends.my_friends_title">Meus Amigos</h2>
-        <div id="friends-list-container">
-          <div class="loading-spinner-container">
-            <div class="spinner"></div>
+        <section class="friends-section">
+          <h2 data-i18n="friends.requests_title">Pedidos de Amizade</h2>
+          <div id="friend-requests-container">
+            <div class="loading-spinner-container">
+              <div class="spinner"></div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <section class="friends-section">
+          <h2 data-i18n="friends.sent_requests_title">Pedidos Enviados</h2>
+          <div id="sent-requests-container">
+            <div class="loading-spinner-container">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
 
     <script src="../../node_modules/firebase/firebase-app-compat.js"></script>

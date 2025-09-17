@@ -50,6 +50,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const minimizeBtn = document.getElementById("minimize-btn");
     const maximizeBtn = document.getElementById("maximize-btn");
     const closeBtn = document.getElementById("close-btn");
+    const listManagementContainer = document.getElementById(
+      "list-management-container"
+    );
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -73,6 +76,24 @@ document.addEventListener("DOMContentLoaded", async () => {
           accentColor: "blue",
           language: "pt",
           listDensity: "compact",
+          listOrder: [
+            "anime",
+            "manga",
+            "movies",
+            "series",
+            "comics",
+            "books",
+            "games",
+          ],
+          listVisibility: {
+            anime: true,
+            manga: true,
+            movies: true,
+            series: true,
+            comics: true,
+            books: true,
+            games: true,
+          },
         };
       } finally {
         applyAppearance(currentSettings);
@@ -80,6 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         accentColorSelector.value = currentSettings.accentColor || "blue";
         listDensitySelector.value = currentSettings.listDensity || "compact";
         languageSelector.value = currentSettings.language || "pt";
+        renderListManagement();
         window.electronAPI?.readyToShow();
       }
     }
@@ -199,6 +221,77 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
     }
 
+    function renderListManagement() {
+      const listOrder = currentSettings.listOrder || [
+        "anime",
+        "manga",
+        "movies",
+        "series",
+        "comics",
+        "books",
+        "games",
+      ];
+      const listVisibility = currentSettings.listVisibility || {
+        anime: true,
+        manga: true,
+        movies: true,
+        series: true,
+        comics: true,
+        books: true,
+        games: true,
+      };
+
+      listManagementContainer.innerHTML = "";
+      const listElement = document.createElement("div");
+      listElement.className = "list-management";
+      listOrder.forEach((listType) => {
+        const isVisible =
+          listVisibility[listType] !== undefined
+            ? listVisibility[listType]
+            : true;
+        const item = document.createElement("div");
+        item.className = "list-toggle";
+        item.dataset.listType = listType;
+        item.innerHTML = `
+          <div>
+            <i class="fas fa-grip-vertical drag-handle"></i>
+            <span data-i18n="hub.card_${listType}">${t(
+          `hub.card_${listType}`
+        )}</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" ${isVisible ? "checked" : ""}>
+            <span class="slider"></span>
+          </label>
+        `;
+        listElement.appendChild(item);
+      });
+      listManagementContainer.appendChild(listElement);
+
+      new Sortable(listElement, {
+        animation: 150,
+        handle: ".drag-handle",
+        onEnd: async () => {
+          const newListOrder = Array.from(
+            listElement.querySelectorAll(".list-toggle")
+          ).map((item) => item.dataset.listType);
+          currentSettings.listOrder = newListOrder;
+          await window.electronAPI.saveSettings(currentSettings);
+        },
+      });
+    }
+
+    async function handleVisibilityChange(event) {
+      if (event.target.type === "checkbox") {
+        const listType = event.target.closest(".list-toggle").dataset.listType;
+        if (!currentSettings.listVisibility) {
+          currentSettings.listVisibility = {};
+        }
+        currentSettings.listVisibility[listType] = event.target.checked;
+        await window.electronAPI.saveSettings(currentSettings);
+      }
+    }
+
     function setupEventListeners() {
       sidebarLinks.forEach((link) => {
         link.addEventListener("click", (e) => {
@@ -273,6 +366,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           hideModal();
         }
       });
+
+      listManagementContainer.addEventListener(
+        "change",
+        handleVisibilityChange
+      );
 
       window.electronAPI.handleDeepLink(async (url) => {
         if (!isReauthenticatingForDelete || !currentUser) return;

@@ -13,6 +13,17 @@ function normalizeData(item) {
     },
   ];
 
+  // Extract and clean subjects as genres
+  const genres = (item.subjects || [])
+    .filter(
+      (s) =>
+        s.length < 30 &&
+        !s.includes("(Fictitious character)") &&
+        !s.includes("--")
+    )
+    .slice(0, 10)
+    .map((s) => ({ name: s })); // Make it an array of objects to be consistent
+
   return {
     id: item.key,
     mal_id: item.key,
@@ -23,6 +34,7 @@ function normalizeData(item) {
       : null,
     synopsis: synopsis,
     temporadas: children,
+    genres: genres, // Add genres here
   };
 }
 
@@ -95,7 +107,7 @@ export const booksService = {
       type: "Livro",
       status: "",
       episodes: 1,
-      genres: [],
+      genres: response.genres || [], // Pass genres here
     };
   },
 };

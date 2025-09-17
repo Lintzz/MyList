@@ -29,7 +29,11 @@
       </div>
     </div>
 
-    <div class="profile-container">
+    <div id="loading-screen">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="profile-container hidden">
       <div class="profile-header">
         <img
           id="cover-photo"
@@ -48,10 +52,6 @@
           <button id="edit-profile-btn" class="profile-action-btn">
             <i class="fas fa-cog"></i>
             <span data-i18n="profile.edit_button">Editar Perfil</span>
-          </button>
-          <button id="share-profile-btn" class="profile-action-btn">
-            <i class="fas fa-share-alt"></i>
-            <span data-i18n="profile.share_button">Compartilhar</span>
           </button>
         </div>
       </div>
@@ -92,19 +92,37 @@
               <div class="stat-info">
                 <span id="total-time" class="stat-value">0h</span>
                 <span class="stat-label" data-i18n="dashboard.total_time"
-                  >Tempo Gasto (Est.)</span
+                  >Tempo Gasto (Total)</span
                 >
               </div>
             </div>
-          </div>
-        </section>
-
-        <section class="dashboard-section favorites-section">
-          <h2 data-i18n="dashboard.favorites_title">Meus Favoritos</h2>
-          <div id="favorites-carousel" class="carousel-container">
-            <p class="placeholder-text" data-i18n="dashboard.no_favorites">
-              Você ainda não marcou nenhum item como favorito.
-            </p>
+            <div class="stat-card">
+              <i class="fas fa-tv"></i>
+              <div class="stat-info">
+                <span id="total-time-animes" class="stat-value">0h</span>
+                <span class="stat-label" data-i18n="dashboard.time_spent_animes"
+                  >Tempo Gasto (Animes)</span
+                >
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-film"></i>
+              <div class="stat-info">
+                <span id="total-time-movies" class="stat-value">0h</span>
+                <span class="stat-label" data-i18n="dashboard.time_spent_movies"
+                  >Tempo Gasto (Filmes)</span
+                >
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-video"></i>
+              <div class="stat-info">
+                <span id="total-time-series" class="stat-value">0h</span>
+                <span class="stat-label" data-i18n="dashboard.time_spent_series"
+                  >Tempo Gasto (Séries)</span
+                >
+              </div>
+            </div>
           </div>
         </section>
 
@@ -113,14 +131,57 @@
             Estatísticas por Lista
           </h2>
           <div id="stats-by-list-container" class="stats-grid">
-            <div class="spinner-container">
-              <div class="spinner"></div>
-            </div>
+            <div class="spinner-container"><div class="spinner"></div></div>
           </div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.main_favorites_title">
+            Favoritos Principais
+          </h2>
+          <div id="main-favorites-carousel" class="carousel-container">
+            <p class="placeholder-text" data-i18n="dashboard.no_main_favorites">
+              Você ainda não marcou nenhum item como favorito principal.
+            </p>
+          </div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_anime">Favoritos - Animes</h2>
+          <div id="anime-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_manga">Favoritos - Mangás</h2>
+          <div id="manga-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_movies">Favoritos - Filmes</h2>
+          <div id="movies-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_series">Favoritos - Séries</h2>
+          <div id="series-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_comics">Favoritos - HQs</h2>
+          <div id="comics-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_books">Favoritos - Livros</h2>
+          <div id="books-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_games">Favoritos - Games</h2>
+          <div id="games-favorites-carousel" class="carousel-container"></div>
         </section>
       </div>
     </div>
-
     <div id="edit-profile-modal-overlay" class="hidden">
       <div id="edit-profile-modal">
         <h2 data-i18n="profile.modal_title">Editar Perfil</h2>
@@ -178,83 +239,68 @@
       </div>
     </div>
 
-    <div
-      id="share-template"
-      style="
-        display: none;
-        width: 600px;
-        padding: 30px;
-        background-color: #1e1e1e;
-        color: #e0e0e0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Helvetica, Arial, sans-serif;
-      "
-    >
-      <h2
-        style="
-          text-align: center;
-          color: var(--accent-color);
-          margin-bottom: 25px;
-        "
-        data-i18n="profile.share_title"
-      >
-        Minhas Estatísticas - MyList
-      </h2>
-      <div
-        style="
-          display: flex;
-          justify-content: space-around;
-          text-align: center;
-          margin-bottom: 25px;
-        "
-      >
-        <div>
-          <div style="font-size: 2em; font-weight: bold" id="share-total-items">
-            0
-          </div>
-          <div
-            style="font-size: 0.9em; color: #a0a0a0"
-            data-i18n="dashboard.total_items"
-          >
-            Itens Totais
-          </div>
-        </div>
-        <div>
-          <div style="font-size: 2em; font-weight: bold" id="share-total-time">
-            0h
-          </div>
-          <div
-            style="font-size: 0.9em; color: #a0a0a0"
-            data-i18n="dashboard.total_time"
-          >
-            Tempo Gasto (Est.)
+    <div id="share-preview-modal-overlay" class="hidden">
+      <div id="share-preview-modal">
+        <h2 data-i18n="profile.share_preview_title">Pré-visualização</h2>
+        <div id="share-preview-container">
+          <div id="share-template-vertical">
+            <div id="share-template-bg"></div>
+            <div class="share-overlay"></div>
+            <div class="share-content">
+              <div class="share-header">
+                <div class="share-avatar-container">
+                  <div
+                    id="share-user-avatar"
+                    src=""
+                    alt="User Avatar"
+                    crossorigin="anonymous"
+                  ></div>
+                </div>
+                <span id="share-user-nickname"></span>
+              </div>
+              <h2 id="share-list-title"></h2>
+              <ol id="share-top-items"></ol>
+              <div class="share-stats-container">
+                <div class="share-stats">
+                  <h3 data-i18n="profile.share_time_spent">Tempo Gasto</h3>
+                  <p id="share-list-time">0h</p>
+                </div>
+                <div class="share-stats">
+                  <h3 data-i18n="profile.share_total_in_list">
+                    Total na Lista
+                  </h3>
+                  <p id="share-list-total">0</p>
+                </div>
+              </div>
+              <div class="share-footer">
+                <p>MyList</p>
+                <span id="share-date"></span>
+              </div>
+            </div>
           </div>
         </div>
-        <div>
-          <div
-            style="font-size: 2em; font-weight: bold"
-            id="share-total-favorites"
-          >
-            0
+        <div class="share-preview-controls">
+          <div class="form-group">
+            <label
+              for="share-bg-selector"
+              data-i18n="profile.share_choose_background"
+              >Escolher Fundo:</label
+            >
+            <select id="share-bg-selector"></select>
           </div>
-          <div
-            style="font-size: 0.9em; color: #a0a0a0"
-            data-i18n="dashboard.favorite_items"
-          >
-            Favoritos
+          <div class="modal-actions">
+            <button id="share-cancel-btn" data-i18n="app.modal_cancel">
+              Cancelar
+            </button>
+            <button
+              id="share-download-btn"
+              class="button-primary"
+              data-i18n="profile.share_download_button"
+            >
+              Baixar Imagem
+            </button>
           </div>
         </div>
-      </div>
-      <div
-        style="
-          text-align: center;
-          margin-top: 20px;
-          font-size: 0.8em;
-          color: #a0a0a0;
-        "
-        data-i18n="profile.share_footer"
-      >
-        Gerado pelo MyList App
       </div>
     </div>
 

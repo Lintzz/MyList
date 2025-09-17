@@ -89,19 +89,37 @@
               <div class="stat-info">
                 <span id="total-time" class="stat-value">0h</span>
                 <span class="stat-label" data-i18n="dashboard.total_time"
-                  >Tempo Gasto (Est.)</span
+                  >Tempo Gasto (Total)</span
                 >
               </div>
             </div>
-          </div>
-        </section>
-
-        <section class="dashboard-section favorites-section">
-          <h2 data-i18n="dashboard.favorites_title">Favoritos</h2>
-          <div id="favorites-carousel" class="carousel-container">
-            <p class="placeholder-text" data-i18n="user_profile.no_favorites">
-              Este utilizador não marcou nenhum item como favorito.
-            </p>
+            <div class="stat-card">
+              <i class="fas fa-tv"></i>
+              <div class="stat-info">
+                <span id="total-time-animes" class="stat-value">0h</span>
+                <span class="stat-label" data-i18n="dashboard.time_spent_animes"
+                  >Tempo Gasto (Animes)</span
+                >
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-film"></i>
+              <div class="stat-info">
+                <span id="total-time-movies" class="stat-value">0h</span>
+                <span class="stat-label" data-i18n="dashboard.time_spent_movies"
+                  >Tempo Gasto (Filmes)</span
+                >
+              </div>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-video"></i>
+              <div class="stat-info">
+                <span id="total-time-series" class="stat-value">0h</span>
+                <span class="stat-label" data-i18n="dashboard.time_spent_series"
+                  >Tempo Gasto (Séries)</span
+                >
+              </div>
+            </div>
           </div>
         </section>
 
@@ -114,6 +132,48 @@
               <div class="spinner"></div>
             </div>
           </div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.main_favorites_title">
+            Favoritos Principais
+          </h2>
+          <div id="main-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_anime">Favoritos - Animes</h2>
+          <div id="anime-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_manga">Favoritos - Mangás</h2>
+          <div id="manga-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_movies">Favoritos - Filmes</h2>
+          <div id="movies-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_series">Favoritos - Séries</h2>
+          <div id="series-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_comics">Favoritos - HQs</h2>
+          <div id="comics-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_books">Favoritos - Livros</h2>
+          <div id="books-favorites-carousel" class="carousel-container"></div>
+        </section>
+
+        <section class="dashboard-section favorites-section">
+          <h2 data-i18n="dashboard.favorites_games">Favoritos - Games</h2>
+          <div id="games-favorites-carousel" class="carousel-container"></div>
         </section>
       </div>
     </div>

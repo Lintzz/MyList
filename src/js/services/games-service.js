@@ -15,6 +15,7 @@ function normalizeData(item) {
     platforms: item.platforms ? item.platforms.map((p) => p.name) : [],
     image_url: item.image ? item.image.original_url : null,
     synopsis: item.deck || "Sinopse não disponível.",
+    genres: item.genres || [],
     temporadas: children,
   };
 }
@@ -90,6 +91,11 @@ export const gamesService = {
         "Item local inválido ou sem mal_id para buscar detalhes."
       );
     }
+
+    if (localItem.genres && localItem.genres.length > 0) {
+      return Promise.resolve({ ...localItem });
+    }
+
     const response = await window.electronAPI.getMediaDetails(
       "games",
       localItem.mal_id

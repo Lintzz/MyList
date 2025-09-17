@@ -126,6 +126,11 @@ export const animeService = {
         genres: [],
       });
     }
+
+    if (localItem.genres && localItem.genres.length > 0) {
+      return Promise.resolve(localItem);
+    }
+
     try {
       const cacheKey = `synopsis_${localItem.mal_id}_${lang}`;
       const cachedSynopsis = sessionStorage.getItem(cacheKey);
@@ -147,14 +152,15 @@ export const animeService = {
 
       const animeCompleto = response.data;
 
-      if (cachedSynopsis) {
+      if (cachedSynopsis && lang !== "en") {
         animeCompleto.synopsis = cachedSynopsis;
       } else {
         animeCompleto.synopsis = await translateText(
           animeCompleto.synopsis,
           lang
         );
-        sessionStorage.setItem(cacheKey, animeCompleto.synopsis);
+        if (lang !== "en")
+          sessionStorage.setItem(cacheKey, animeCompleto.synopsis);
       }
 
       return animeCompleto;
@@ -164,16 +170,15 @@ export const animeService = {
         error
       );
       return {
-        title: localItem.title,
-        synopsis: localItem.synopsis || "Sinopse não disponível.",
-        images: { jpg: { large_image_url: localItem.image_url } },
-        score: "N/A",
-        type: "Anime",
-        status: "",
+        ...localItem,
         episodes: localItem.temporadas.reduce(
           (acc, s) => acc + (s.episodes || 0),
           0
         ),
+        images: { jpg: { large_image_url: localItem.image_url } },
+        score: "N/A",
+        type: "Anime",
+        status: "",
         genres: [],
       };
     }

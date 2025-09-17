@@ -664,10 +664,12 @@
   height: 22px;
   font-size: 1em;
 }
+
 #user-profile-dropdown,
 .options-dropdown,
 #filter-dropdown,
-#sort-dropdown {
+#sort-dropdown,
+#notification-dropdown {
   position: absolute;
   background-color: var(--dropdown-bg-color);
   border: 1px solid var(--dropdown-border-color);
@@ -675,7 +677,9 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   z-index: 1001;
   overflow: hidden;
+  min-width: 180px;
 }
+
 #user-profile-dropdown button,
 .options-dropdown button,
 #filter-dropdown button,
@@ -905,6 +909,7 @@
   justify-content: space-between;
   margin-top: 10px;
   align-items: center;
+  gap: 10px;
 }
 .modal-actions-footer button {
   padding: 10px 20px;
@@ -1128,14 +1133,32 @@
   padding: 20px;
   box-sizing: border-box;
 }
-.login-box,
-.confirm-box {
+.login-box {
   width: 100%;
   max-width: 350px;
   padding: 40px;
   background-color: var(--surface-color);
   border-radius: 8px;
   text-align: center;
+}
+.confirm-box {
+  width: 100%;
+  max-width: 700px;
+  padding: 40px;
+  background-color: var(--surface-color);
+  border-radius: 8px;
+  text-align: center;
+  display: flex;
+  gap: 40px;
+}
+.main-profile-setup,
+.list-setup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.list-setup {
+  justify-content: space-between;
 }
 .login-box h1,
 .confirm-box h1 {
@@ -1174,9 +1197,7 @@
   font-size: 0.9em;
   color: var(--secondary-text-color);
 }
-.confirm-box {
-  max-width: 400px;
-}
+
 .profile-picture-container {
   margin-bottom: 20px;
 }
@@ -1189,7 +1210,7 @@
 }
 .confirm-box .form-group {
   text-align: left;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
 .confirm-box .form-group label {
   display: block;
@@ -1227,9 +1248,10 @@
   cursor: not-allowed;
 }
 #status-message {
-  margin-top: 20px;
+  margin-top: 15px;
   font-size: 0.9em;
   color: var(--secondary-text-color);
+  min-height: 1.2em;
 }
 
 #modal-actions {
@@ -1621,3 +1643,182 @@
   font-weight: bold;
   font-size: 0.9em;
 }
+
+/* --- ESTILOS PARA CONFIRM-REGISTER.HTML --- */
+#list-selection-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.list-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: var(--surface-highlight-color);
+  border-radius: 5px;
+}
+
+.list-toggle .drag-handle {
+  cursor: grab;
+  color: var(--secondary-text-color);
+  margin-right: 10px;
+}
+
+.list-toggle .drag-handle:active {
+  cursor: grabbing;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--button-bg-color);
+  transition: 0.4s;
+  border-radius: 24px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: var(--accent-color);
+}
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* --- ESTILOS DA BARRA DE TÍTULO E SINO --- */
+#title-bar {
+  display: flex;
+  height: 40px;
+  background-color: var(--bg-color);
+  align-items: center;
+  flex-shrink: 0;
+}
+
+#title-bar-left {
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}
+
+#notification-bell {
+  -webkit-app-region: no-drag;
+  position: relative;
+  margin-left: 10px;
+  cursor: pointer;
+  color: var(--secondary-text-color);
+  padding: 5px 8px;
+  border-radius: 5px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+#notification-bell:hover {
+  background-color: var(--surface-highlight-color);
+  color: var(--primary-text-color);
+}
+
+#notification-bell .badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--destructive-color);
+  color: white;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 0.7em;
+  font-weight: bold;
+}
+/* --- FIM DOS ESTILOS DO SINO --- */
+
+/* --- DROPDOWN DE NOTIFICAÇÕES --- */
+#notification-dropdown {
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1002;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+.notification-item:last-child {
+  border-bottom: none;
+}
+.notification-item img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.notification-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.notification-info strong,
+.notification-info span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.notification-info strong {
+  font-size: 0.9em;
+}
+.notification-info span {
+  font-size: 0.8em;
+  color: var(--secondary-text-color);
+}
+.notification-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.notification-actions button {
+  font-size: 0.8em;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.notification-actions .accept-btn {
+  background-color: var(--success-color);
+  color: white;
+  border: 1px solid var(--success-color);
+}
+.notification-actions .decline-btn {
+  background-color: var(--destructive-color);
+  color: white;
+  border: 1px solid var(--destructive-color);
+}
+/* --- FIM DO DROPDOWN --- */

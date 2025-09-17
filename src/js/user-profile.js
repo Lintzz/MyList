@@ -33,8 +33,15 @@ function calculateAndRenderOverview(lists) {
   let totalCompleted = 0;
   let totalFavorites = 0;
   let totalMinutes = 0;
+  let animeMinutes = 0;
+  let seriesMinutes = 0;
+  let moviesMinutes = 0;
 
-  const timeEstimates = { anime: 24, series: 45, movies: 110 };
+  const timeEstimates = {
+    anime: 24,
+    series: 45,
+    movies: 110,
+  };
 
   for (const mediaType in lists) {
     const list = lists[mediaType] || [];
@@ -43,9 +50,12 @@ function calculateAndRenderOverview(lists) {
       if (item.isFavorite) {
         totalFavorites++;
       }
-      if (item.temporadas && Array.isArray(item.temporadas)) {
-        let isFinished = true;
-        let watchedEpisodes = 0;
+
+      let isFinished = true;
+      let watchedEpisodes = 0;
+      if (!item.temporadas || item.temporadas.length === 0) {
+        isFinished = false;
+      } else {
         item.temporadas.forEach((season) => {
           watchedEpisodes += season.watched_episodes || 0;
           if (
@@ -55,10 +65,15 @@ function calculateAndRenderOverview(lists) {
             isFinished = false;
           }
         });
-        if (isFinished) totalCompleted++;
-        if (timeEstimates[mediaType]) {
-          totalMinutes += watchedEpisodes * timeEstimates[mediaType];
-        }
+      }
+      if (isFinished) totalCompleted++;
+
+      if (timeEstimates[mediaType]) {
+        const itemMinutes = watchedEpisodes * timeEstimates[mediaType];
+        totalMinutes += itemMinutes;
+        if (mediaType === "anime") animeMinutes += itemMinutes;
+        if (mediaType === "series") seriesMinutes += itemMinutes;
+        if (mediaType === "movies") moviesMinutes += itemMinutes;
       }
     });
   }
@@ -66,43 +81,96 @@ function calculateAndRenderOverview(lists) {
   document.getElementById("total-items").textContent = totalItems;
   document.getElementById("total-completed").textContent = totalCompleted;
   document.getElementById("total-favorites").textContent = totalFavorites;
-  const totalHours = Math.floor(totalMinutes / 60);
-  document.getElementById("total-time").textContent = `${totalHours}h`;
+  document.getElementById("total-time").textContent = `${Math.floor(
+    totalMinutes / 60
+  )}h`;
+  document.getElementById("total-time-animes").textContent = `${Math.floor(
+    animeMinutes / 60
+  )}h`;
+  document.getElementById("total-time-series").textContent = `${Math.floor(
+    seriesMinutes / 60
+  )}h`;
+  document.getElementById("total-time-movies").textContent = `${Math.floor(
+    moviesMinutes / 60
+  )}h`;
 }
 
 function renderFavoritesCarousel(lists) {
-  const carouselContainer = document.getElementById("favorites-carousel");
-  const allFavorites = [];
+  const containers = {
+    main: document.getElementById("main-favorites-carousel"),
+    anime: document.getElementById("anime-favorites-carousel"),
+    manga: document.getElementById("manga-favorites-carousel"),
+    movies: document.getElementById("movies-favorites-carousel"),
+    series: document.getElementById("series-favorites-carousel"),
+    comics: document.getElementById("comics-favorites-carousel"),
+    books: document.getElementById("books-favorites-carousel"),
+    games: document.getElementById("games-favorites-carousel"),
+  };
+
+  const favorites = {
+    main: [],
+    anime: [],
+    manga: [],
+    movies: [],
+    series: [],
+    comics: [],
+    books: [],
+    games: [],
+  };
 
   for (const mediaType in lists) {
     const list = lists[mediaType] || [];
     list.forEach((item) => {
-      if (item.isFavorite) {
-        allFavorites.push(item);
+      if (item.isSuperFavorite) {
+        favorites.main.push(item);
+      }
+      if (item.isFavorite && favorites[mediaType]) {
+        favorites[mediaType].push(item);
       }
     });
   }
 
-  if (allFavorites.length === 0) {
-    carouselContainer.innerHTML = `<p class="placeholder-text">${t(
-      "user_profile.no_favorites"
-    )}</p>`;
-    return;
-  }
+  const renderCarousel = (container, items, emptyMessageKey) => {
+    if (!container) return;
 
-  carouselContainer.innerHTML = "";
-  allFavorites.forEach((item) => {
-    const card = document.createElement("div");
-    card.className = "favorite-item-card";
-    card.innerHTML = `
+    const section = container.closest(".dashboard-section");
+
+    if (items.length === 0) {
+      if (section) section.style.display = "none";
+      return;
+    }
+
+    if (section) section.style.display = "block";
+
+    container.innerHTML = "";
+    items.forEach((item) => {
+      const card = document.createElement("div");
+      card.className = "favorite-item-card";
+      card.innerHTML = `
             <img src="${
               item.image_url ||
               "https://placehold.co/140x200/1f1f1f/ffffff?text=Capa"
             }" alt="${item.title}">
             <span>${item.title}</span>
         `;
-    carouselContainer.appendChild(card);
-  });
+      container.appendChild(card);
+    });
+  };
+
+  renderCarousel(
+    containers.main,
+    favorites.main,
+    "dashboard.no_main_favorites"
+  );
+  for (const mediaType in favorites) {
+    if (mediaType !== "main") {
+      renderCarousel(
+        containers[mediaType],
+        favorites[mediaType],
+        "dashboard.no_favorites"
+      );
+    }
+  }
 }
 
 function renderStatsByList(lists) {
@@ -141,18 +209,21 @@ function renderStatsByList(lists) {
         }
       });
 
+      const headerKey = `hub.card_${mediaType}`;
+      const unitKey = `dashboard.unit_${mediaType}`;
+
       const card = document.createElement("div");
       card.className = "list-stat-card";
       card.innerHTML = `
                 <h3><i class="fas ${listIcons[mediaType]}"></i> ${t(
-        `hub.card_${mediaType}`
+        headerKey
       )}</h3>
                 <ul>
                     <li><span>${t(
                       "user_profile.total_in_list"
                     )}</span><span>${totalCount}</span></li>
                     <li><span>${t(
-                      "user_profile.units_watched_read"
+                      unitKey
                     )}</span><span>${watchedCount}</span></li>
                 </ul>
             `;
