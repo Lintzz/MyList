@@ -417,6 +417,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const shareBgSelector = document.getElementById("share-bg-selector");
   const shareDownloadBtn = document.getElementById("share-download-btn");
   const shareCancelBtn = document.getElementById("share-cancel-btn");
+  const friendListModalOverlay = document.getElementById(
+    "friend-list-modal-overlay"
+  );
+  const friendListModalTitle = document.getElementById(
+    "friend-list-modal-title"
+  );
+  const friendListModalContent = document.getElementById(
+    "friend-list-modal-content"
+  );
+  const friendListModalCloseBtn = document.getElementById(
+    "friend-list-modal-close-btn"
+  );
 
   auth.onAuthStateChanged(async (user) => {
     if (user) {

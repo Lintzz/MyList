@@ -2,137 +2,71 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title data-i18n="history.patch_notes_title">Novidades da Versão</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' app:;"
+    />
+    <title data-i18n="history.patch_notes_main_title">
+      Notas da Atualização - MyList
+    </title>
     <link rel="stylesheet" href="../css/global.css" />
     <link rel="stylesheet" href="../css/patch-notes.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
   </head>
   <body>
-    <div class="container">
-      <h1 data-i18n="history.patch_notes_main_title">
-        Notas da Atualização - MyList
-      </h1>
-
-      <h2 data-i18n="history.highlights_title">
-        ✨ Novidades e Principais Destaques ✨
-      </h2>
-      <ul>
-        <li data-i18n="history.highlight_1">
-          <strong>Personalização Total das Listas:</strong> Assuma o controle
-          total da sua interface, deixando-a mais limpa e organizada.
-        </li>
-        <li data-i18n="history.highlight_2">
-          <strong>Página de Amigos Redesenhada:</strong> Uma experiência social
-          mais intuitiva e completa.
-        </li>
-        <li data-i18n="history.highlight_3">
-          <strong>Perfil Detalhado e Inteligente:</strong> Agora seu perfil
-          reflete com muito mais precisão seus gostos e seu tempo investido.
-        </li>
-        <li data-i18n="history.highlight_4">
-          <strong>Compartilhamento Social Aprimorado:</strong> Cards de
-          compartilhamento redesenhados para se destacarem em qualquer rede
-          social.
-        </li>
-        <li data-i18n="history.highlight_5">
-          <strong>Compare com Amigos:</strong> Descubra afinidades e compare
-          estatísticas com seus amigos de uma forma totalmente nova!
-        </li>
-        <li data-i18n="history.highlight_6">
-          <strong>Tutorial Interativo:</strong> Um novo tour guiado ajuda os
-          novos utilizadores a começarem a usar a aplicação.
-        </li>
-      </ul>
-
-      <h2 data-i18n="history.details_title">
-        📋 Detalhes Completos da Atualização 📋
-      </h2>
-
-      <h4 data-i18n="history.list_management_title">Gerenciamento de Listas</h4>
-      <ul>
-        <li data-i18n="history.list_management_1">
-          <strong>Ativar e Desativar Listas:</strong> Chega de poluição visual!
-          Agora você pode desativar completamente as listas que não utiliza.
-        </li>
-        <li data-i18n="history.list_management_2">
-          <strong>Seleção de Listas no Cadastro:</strong> Novos usuários agora
-          podem escolher quais listas desejam ativar durante o processo de
-          criação de conta.
-        </li>
-        <li data-i18n="history.list_management_3">
-          <strong>Reordenação de Listas:</strong> Organize como quiser!
-          Adicionamos a funcionalidade de arrastar e reordenar suas listas no
-          menu principal e no menu suspenso.
-        </li>
-        <li data-i18n="history.list_management_4">
-          <strong>Tutorial Interativo:</strong> Adicionámos um tour passo a
-          passo para apresentar as principais funcionalidades aos novos
-          utilizadores.
-        </li>
-      </ul>
-
-      <h4 data-i18n="history.social_title">Social e Amigos</h4>
-      <ul>
-        <li data-i18n="history.social_1">
-          <strong>Página de Amigos Reestruturada:</strong> A seção foi
-          redesenhada com abas para "Amigos" e "Adicionar Amigos", unificando a
-          busca e o gerenciamento de solicitações.
-        </li>
-        <li data-i18n="history.social_2">
-          <strong>Ícone de Notificações:</strong> Um novo ícone de sino na barra
-          superior alertará sobre novas solicitações de amizade.
-        </li>
-        <li data-i18n="history.social_3">
-          <strong>Melhora na Usabilidade:</strong> A interface da lista de
-          amigos foi aprimorada para deixar mais evidente que o nome e a foto
-          são clicáveis.
-        </li>
-      </ul>
-
-      <h4 data-i18n="history.profile_title">Perfil e Estatísticas</h4>
-      <ul>
-        <li data-i18n="history.profile_1">
-          <strong>Estatísticas Detalhadas:</strong> O perfil agora exibe o tempo
-          gasto separadamente para animes, filmes e séries.
-        </li>
-        <li data-i18n="history.profile_2">
-          <strong>Favoritos por Categoria:</strong> Cada lista agora tem sua
-          própria seção de favoritos no perfil.
-        </li>
-        <li data-i18n="history.profile_3">
-          <strong>"Favorito dos Favoritos":</strong> Selecione seus favoritos
-          "principais" para que eles apareçam em destaque no topo do seu perfil.
-        </li>
-      </ul>
-
-      <h4 data-i18n="history.sharing_title">Compartilhamento de Perfil</h4>
-      <ul>
-        <li data-i18n="history.sharing_1">
-          <strong>Novo Design de "Print":</strong> O card de compartilhamento
-          foi redesenhado em formato vertical, otimizado para redes sociais.
-        </li>
-        <li data-i18n="history.sharing_2">
-          <strong>Compartilhamento por Lista:</strong> Gere um "print" para cada
-          uma das suas listas de estatísticas individualmente.
-        </li>
-      </ul>
-
-      <h4 data-i18n="history.compare_title">
-        Novo Recurso: Comparações entre Amigos
-      </h4>
-      <ul>
-        <li data-i18n="history.compare_1">
-          <strong>Área de Comparação:</strong> Introduzimos uma nova seção onde
-          você pode se comparar com seus amigos através de gráficos e
-          visualizações de dados interativas.
-        </li>
-      </ul>
-
-      <button id="close-btn" class="close-btn" data-i18n="history.close_button">
-        Fechar
-      </button>
+    <div id="title-bar">
+      <div id="drag-region"></div>
+      <div id="window-controls">
+        <button id="close-btn" data-i18n="[title]window.close">✕</button>
+      </div>
     </div>
 
+    <div class="patch-notes-container">
+      <h1 data-i18n="history.patch_notes_title">Novidades da Versão</h1>
+      <div class="version-section">
+        <h2 data-i18n="history.version_1_2_6_title">
+          ✨ Versão 1.2.6 (Opiniões e Interação)
+        </h2>
+
+        <h3 data-i18n="history.new_features_title">🚀 Novas Funcionalidades</h3>
+        <ul>
+          <li data-i18n="history.version_1_2_6_feature_1">
+            <span class="highlight">Geral</span
+            ><strong>Sistema de Avaliação e Comentários:</strong> Agora você
+            pode dar uma nota de 0 a 5 estrelas e adicionar um comentário
+            pessoal para cada item em suas listas através do modal de edição.
+          </li>
+          <li data-i18n="history.version_1_2_6_feature_2">
+            <span class="highlight">Social</span
+            ><strong>Veja as Listas dos Seus Amigos:</strong> Adicionado um
+            ícone de lupa (<i class="fas fa-search"></i>) nas estatísticas de
+            lista no perfil de um amigo. Ao clicar, você pode ver a lista
+            completa da pessoa, incluindo as notas e comentários que ela deu
+            para cada item.
+          </li>
+        </ul>
+
+        <h3 data-i18n="history.improvements_title">🛠️ Melhorias</h3>
+        <ul>
+          <li data-i18n="history.version_1_2_6_improvement_1">
+            <span class="highlight">Interface</span
+            ><strong>Lógica das Estrelas:</strong> A seleção de estrelas agora
+            funciona da esquerda para a direita e é possível remover a avaliação
+            (deixar com 0 estrelas) clicando novamente na nota atual.
+          </li>
+          <li data-i18n="history.version_1_2_6_improvement_2">
+            <span class="highlight">Interface</span
+            ><strong>Visual Limpo:</strong> A exibição das estrelas foi removida
+            da tela principal da lista para manter a interface mais limpa,
+            ficando disponível na tela de edição e na visualização da lista de
+            amigos.
+          </li>
+        </ul>
+      </div>
+    </div>
     <script src="../js/patch-notes.js" type="module"></script>
   </body>
 </html>

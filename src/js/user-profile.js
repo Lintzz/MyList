@@ -1,4 +1,5 @@
 let auth, db, t;
+let userListsData = {}; // Armazenar os dados de todas as listas do usuário visualizado
 
 async function applyTranslations(lang) {
   const response = await fetch(`../locales/${lang}.json`);
@@ -215,9 +216,14 @@ function renderStatsByList(lists) {
       const card = document.createElement("div");
       card.className = "list-stat-card";
       card.innerHTML = `
-                <h3><i class="fas ${listIcons[mediaType]}"></i> ${t(
-        headerKey
-      )}</h3>
+                <h3>
+                  <i class="fas ${listIcons[mediaType]}"></i> ${t(headerKey)}
+                  <button class="view-list-btn" data-media-type="${mediaType}" title="${t(
+        "user_profile.view_list_tooltip"
+      )}">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </h3>
                 <ul>
                     <li><span>${t(
                       "user_profile.total_in_list"
@@ -238,6 +244,64 @@ function renderStatsByList(lists) {
   }
 }
 
+function showFriendListModal(mediaType) {
+  const overlay = document.getElementById("friend-list-modal-overlay");
+  const titleEl = document.getElementById("friend-list-modal-title");
+  const contentEl = document.getElementById("friend-list-modal-content");
+
+  titleEl.textContent = t(`hub.card_${mediaType}`);
+  contentEl.innerHTML = '<div class="spinner"></div>';
+
+  overlay.classList.remove("hidden");
+  setTimeout(() => overlay.classList.add("visible"), 10);
+
+  const list = userListsData[mediaType] || [];
+
+  if (list.length === 0) {
+    contentEl.innerHTML = `<p class="placeholder-text">${t(
+      "user_profile.no_items_in_list"
+    )}</p>`;
+    return;
+  }
+
+  let itemsHtml = "";
+  list.forEach((item) => {
+    let ratingHtml = '<div class="friend-list-item-rating">';
+    for (let i = 1; i <= 5; i++) {
+      ratingHtml += `<i class="fas fa-star ${
+        i <= (item.rating || 0) ? "" : "empty"
+      }"></i>`;
+    }
+    ratingHtml += "</div>";
+
+    itemsHtml += `
+        <div class="friend-list-item">
+          <img src="${
+            item.image_url ||
+            "https://placehold.co/60x85/1f1f1f/ffffff?text=Capa"
+          }" alt="Capa" class="friend-list-item-cover">
+          <div class="friend-list-item-details">
+            <h4>${item.title}</h4>
+            ${ratingHtml}
+            ${
+              item.comment
+                ? `<p class="friend-list-item-comment">${item.comment}</p>`
+                : ""
+            }
+          </div>
+        </div>
+      `;
+  });
+
+  contentEl.innerHTML = itemsHtml;
+}
+
+function hideFriendListModal() {
+  const overlay = document.getElementById("friend-list-modal-overlay");
+  overlay.classList.remove("visible");
+  setTimeout(() => overlay.classList.add("hidden"), 200);
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const firebaseReady = await window.firebaseInitializationPromise;
   if (!firebaseReady) return;
@@ -254,6 +318,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const coverPhoto = document.getElementById("cover-photo");
   const userAvatar = document.getElementById("user-avatar");
   const userNickname = document.getElementById("user-nickname");
+  const statsContainer = document.getElementById("stats-by-list-container");
+  const friendListModalOverlay = document.getElementById(
+    "friend-list-modal-overlay"
+  );
+  const friendListModalCloseBtn = document.getElementById(
+    "friend-list-modal-close-btn"
+  );
 
   auth.onAuthStateChanged(async (user) => {
     if (!user) {
@@ -281,6 +352,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       const userData = userDoc.data();
+      userListsData = userData.lists || {};
 
       document.title = `${t("user_profile.title")} - ${userData.displayName}`;
       coverPhoto.src =
@@ -290,10 +362,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         "https://placehold.co/120x120/1f1f1f/ffffff?text=A";
       userNickname.textContent = userData.displayName;
 
-      const userLists = userData.lists || {};
-      calculateAndRenderOverview(userLists);
-      renderFavoritesCarousel(userLists);
-      renderStatsByList(userLists);
+      calculateAndRenderOverview(userListsData);
+      renderFavoritesCarousel(userListsData);
+      renderStatsByList(userListsData);
     } catch (error) {
       console.error("Erro ao carregar perfil do utilizador:", error);
       profileContainer.innerHTML = `<h1>${t(
@@ -303,6 +374,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       loadingScreen.classList.add("hidden");
       profileContainer.classList.remove("hidden");
       window.electronAPI.readyToShow();
+    }
+  });
+
+  statsContainer.addEventListener("click", (e) => {
+    const viewListBtn = e.target.closest(".view-list-btn");
+    if (viewListBtn) {
+      const mediaType = viewListBtn.dataset.mediaType;
+      showFriendListModal(mediaType);
+    }
+  });
+
+  friendListModalCloseBtn.addEventListener("click", hideFriendListModal);
+  friendListModalOverlay.addEventListener("click", (e) => {
+    if (e.target === friendListModalOverlay) {
+      hideFriendListModal();
     }
   });
 

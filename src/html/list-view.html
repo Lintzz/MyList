@@ -342,22 +342,46 @@
         <h2>
           <span data-i18n="app.edit_modal_title">Editar Item:</span>
         </h2>
-        <div class="form-group">
-          <label for="edit-title-input" data-i18n="app.edit_modal_title_label"
-            >Título</label
-          >
-          <input type="text" id="edit-title-input" />
+        <div class="edit-modal-top-section">
+          <div class="form-group">
+            <label for="edit-title-input" data-i18n="app.edit_modal_title_label"
+              >Título</label
+            >
+            <input type="text" id="edit-title-input" />
+          </div>
+          <div class="form-group" id="edit-author-group">
+            <label
+              for="edit-author-input"
+              data-i18n="app.edit_modal_author_label"
+              >Autor/Editora</label
+            >
+            <input type="text" id="edit-author-input" />
+          </div>
         </div>
-        <div class="form-group" id="edit-author-group">
-          <label for="edit-author-input" data-i18n="app.edit_modal_author_label"
-            >Autor/Editora</label
-          >
-          <input type="text" id="edit-author-input" />
+        <div class="edit-modal-rating-section">
+          <div class="form-group">
+            <label data-i18n="app.rating_label">Sua Avaliação</label>
+            <div class="star-rating" id="edit-star-rating">
+              <i class="fas fa-star" data-value="1"></i>
+              <i class="fas fa-star" data-value="2"></i>
+              <i class="fas fa-star" data-value="3"></i>
+              <i class="fas fa-star" data-value="4"></i>
+              <i class="fas fa-star" data-value="5"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-comment-input" data-i18n="app.comment_label"
+              >Seu Comentário</label
+            >
+            <textarea id="edit-comment-input" rows="3"></textarea>
+          </div>
         </div>
-        <p data-i18n="app.edit_modal_subtitle" id="edit-seasons-subtitle">
-          Reordene, apague ou adicione novas partes.
-        </p>
-        <div id="edit-season-list"></div>
+        <div id="edit-seasons-section">
+          <p data-i18n="app.edit_modal_subtitle" id="edit-seasons-subtitle">
+            Reordene, apague ou adicione novas partes.
+          </p>
+          <div id="edit-season-list"></div>
+        </div>
         <div class="modal-actions-footer">
           <div class="modal-actions-left">
             <button

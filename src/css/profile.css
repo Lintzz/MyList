@@ -40,9 +40,6 @@ body {
 #btn-back:hover {
   background-color: var(--surface-highlight-color);
 }
-#btn-back i {
-  margin-right: 8px;
-}
 
 .profile-container {
   height: 100%;
@@ -246,7 +243,8 @@ body {
   color: var(--accent-color);
 }
 
-.list-stat-card .share-list-btn {
+.list-stat-card .share-list-btn,
+.list-stat-card .view-list-btn {
   margin-left: auto;
   background: none;
   border: none;
@@ -258,7 +256,8 @@ body {
   transition: background-color 0.2s, color 0.2s;
 }
 
-.list-stat-card .share-list-btn:hover {
+.list-stat-card .share-list-btn:hover,
+.list-stat-card .view-list-btn:hover {
   background-color: var(--surface-color);
   color: var(--accent-color);
 }
@@ -603,4 +602,112 @@ body {
   background-color: var(--surface-color);
   padding: 10px;
   border-radius: 8px;
+}
+
+#friend-list-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 4000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+}
+#friend-list-modal-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#friend-list-modal {
+  background-color: var(--surface-color);
+  padding: 25px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.95);
+  transition: transform 0.2s ease-in-out;
+}
+#friend-list-modal-overlay.visible #friend-list-modal {
+  transform: scale(1);
+}
+
+#friend-list-modal h2 {
+  margin-top: 0;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+#friend-list-modal-content {
+  overflow-y: auto;
+  flex-grow: 1;
+  margin: 15px 0;
+}
+
+.friend-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+.friend-list-item:last-child {
+  border-bottom: none;
+}
+
+.friend-list-item-cover {
+  width: 60px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.friend-list-item-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 8px;
+}
+.friend-list-item-details h4 {
+  margin: 0;
+  border: none;
+  padding: 0;
+  font-size: 1.1em;
+}
+.friend-list-item-rating {
+  font-size: 1em;
+  color: var(--warning-color);
+}
+.friend-list-item-rating .fa-star.empty {
+  color: var(--secondary-text-color);
+}
+.friend-list-item-comment {
+  font-style: italic;
+  color: var(--secondary-text-color);
+  background-color: var(--surface-highlight-color);
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  white-space: pre-wrap;
+}
+
+#friend-list-modal-close-btn {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: var(--button-bg-color);
+  color: var(--primary-text-color);
+  align-self: flex-end;
+  margin-top: 10px;
 }

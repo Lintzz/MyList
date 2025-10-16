@@ -355,7 +355,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             break;
           case "add-item-direct":
             abrirModalStatus(malId, title, itemType);
-            // CORREÇÃO: Avança o tutorial quando o modal de status abre
             if (window.tour && window.tour.isActive()) {
               window.tour.next();
             }
@@ -917,6 +916,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       const addCustomSeasonBtn = document.getElementById(
         "add-custom-season-btn"
       );
+      const ratingSection = document.querySelector(
+        ".edit-modal-rating-section"
+      );
+      const seasonsSection = document.getElementById("edit-seasons-section");
+
+      document.getElementById("edit-comment-input").value =
+        itemEmEdicao.comment || "";
+      const stars = document.querySelectorAll("#edit-star-rating .fa-star");
+      stars.forEach((star) => {
+        star.classList.toggle(
+          "selected",
+          star.dataset.value <= (itemEmEdicao.rating || 0)
+        );
+      });
 
       if (itemEmEdicao.isCustom) {
         checkNewSeasonsBtn.classList.add("hidden");
@@ -1003,6 +1016,13 @@ document.addEventListener("DOMContentLoaded", async () => {
           itemEmEdicao.authors = [newAuthor];
         }
       }
+
+      const ratingStars = document.querySelectorAll(
+        "#edit-star-rating .fa-star.selected"
+      );
+      itemEmEdicao.rating = ratingStars.length;
+      itemEmEdicao.comment =
+        document.getElementById("edit-comment-input").value;
 
       if (currentMediaType !== "books" && currentMediaType !== "games") {
         const novasTemporadas = [];
@@ -2085,6 +2105,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         proximoId--;
       }
     }
+
+    editModalOverlay.addEventListener("click", (e) => {
+      const star = e.target.closest(".star-rating .fa-star");
+      if (star) {
+        const rating = parseInt(star.dataset.value, 10);
+        const stars = Array.from(
+          document.querySelectorAll("#edit-star-rating .fa-star")
+        );
+        const currentRating = stars.filter((s) =>
+          s.classList.contains("selected")
+        ).length;
+
+        if (currentRating === rating) {
+          // Se clicar na mesma estrela, desmarca tudo (ou a partir dela)
+          stars.forEach((s) => s.classList.remove("selected"));
+        } else {
+          // Caso contrário, seleciona até a estrela clicada
+          stars.forEach((s, index) => {
+            s.classList.toggle("selected", index < rating);
+          });
+        }
+      }
+    });
   } catch (error) {
     console.error("Erro no DOMContentLoaded do app.js:", error);
     showErrorModal(

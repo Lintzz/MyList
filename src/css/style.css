@@ -1822,3 +1822,32 @@ input:checked + .slider:before {
   border: 1px solid var(--destructive-color);
 }
 /* --- FIM DO DROPDOWN --- */
+.star-rating {
+  display: flex;
+  gap: 5px;
+  cursor: pointer;
+}
+.star-rating .fa-star {
+  font-size: 1.5em;
+  color: var(--secondary-text-color);
+  transition: color 0.2s;
+}
+.star-rating:hover .fa-star {
+  color: var(--warning-color);
+}
+.star-rating .fa-star:hover ~ .fa-star {
+  color: var(--secondary-text-color);
+}
+.star-rating .fa-star.selected {
+  color: var(--warning-color);
+}
+#edit-comment-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  background-color: var(--input-bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  color: var(--primary-text-color);
+  resize: vertical;
+}
